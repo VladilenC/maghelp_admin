@@ -59,13 +59,9 @@ class EventEdit extends StatefulWidget {
 
 class _EventEditState extends State<EventEdit> {
   final _formKey2 = GlobalKey<FormState>();
-  final listOfPets = ["Cats", "Dogs", "Rabbits"];
-  String dropdownValue = 'Cats';
   final nameController = TextEditingController();
   final typeController = TextEditingController();
   final subtypeController = TextEditingController();
-  final ageController = TextEditingController();
-  final dbRef = FirebaseDatabase.instance.reference().child("pets");
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +81,7 @@ class _EventEditState extends State<EventEdit> {
             padding: EdgeInsets.all(20.0),
             child: TextFormField(
               controller: _typeController,
+              enabled: false,
               decoration: InputDecoration(
                 labelText: "Введите тип",
                 enabledBorder: OutlineInputBorder(
@@ -104,6 +101,7 @@ class _EventEditState extends State<EventEdit> {
                 padding: EdgeInsets.all(20.0),
                 child: TextFormField(
                   controller: _subtypeController,
+                  enabled: false,
                   decoration: InputDecoration(
                     labelText: "Введите подтип",
                     enabledBorder: OutlineInputBorder(
@@ -152,7 +150,6 @@ class _EventEditState extends State<EventEdit> {
                           "name": _nameController.text,
                           "type": _typeController.text,
                           "subtype": _subtypeController.text
-                          //"type": dropdownValue
                         }).then((_) {
                           Scaffold.of(context).showSnackBar(
                               SnackBar(content: Text('Successfully Added')));
@@ -187,7 +184,6 @@ class _EventEditState extends State<EventEdit> {
   @override
   void dispose() {
     super.dispose();
-    ageController.dispose();
     nameController.dispose();
     typeController.dispose();
     subtypeController.dispose();

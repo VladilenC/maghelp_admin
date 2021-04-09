@@ -32,13 +32,7 @@ class _Actedit extends State<Actedit> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("Измените событие",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w200,
-                      fontSize: 30,
-                      fontFamily: 'Roboto',
-                      fontStyle: FontStyle.italic)),
-              EventEdit(nomer: widget.nomer, name: widget.name, type: widget.type, subtype: widget.description),
+              EventEdit(nomer: widget.nomer, name: widget.name, type: widget.type, event: widget.event, description: widget.description),
             ]),
       )),
     );
@@ -61,13 +55,10 @@ class EventEdit extends StatefulWidget {
 
 class _ActEditState extends State<EventEdit> {
   final _formKey2 = GlobalKey<FormState>();
-  final listOfPets = ["Cats", "Dogs", "Rabbits"];
-  String dropdownValue = 'Cats';
   final nameController = TextEditingController();
   final typeController = TextEditingController();
-  final subtypeController = TextEditingController();
-  final ageController = TextEditingController();
-  var selectType, selectEvent;
+  final eventController = TextEditingController();
+  final descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +67,8 @@ class _ActEditState extends State<EventEdit> {
     var order = int.parse(widget.nomer) + 1;
 
     final _nameController = TextEditingController(text: widget.name);
+    final _typeController = TextEditingController(text: widget.type);
+    final _eventController = TextEditingController(text: widget.event);
     final _descriptionController = TextEditingController(text: widget.description);
 
 
@@ -84,9 +77,10 @@ class _ActEditState extends State<EventEdit> {
     child: SingleChildScrollView(
             child: Column(children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(10.0),
             child: TextFormField(
               controller: _typeController,
+              enabled: false,
               decoration: InputDecoration(
                 labelText: "Введите тип",
                 enabledBorder: OutlineInputBorder(
@@ -103,11 +97,12 @@ class _ActEditState extends State<EventEdit> {
             ),
           ),
               Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(10.0),
                 child: TextFormField(
-                  controller: _subtypeController,
+                  controller: _eventController,
+                  enabled: false,
                   decoration: InputDecoration(
-                    labelText: "Введите подтип",
+                    labelText: "Введите событие",
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -115,14 +110,14 @@ class _ActEditState extends State<EventEdit> {
                   // The validator receives the text that the user has entered.
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Подтип обязателен';
+                      return 'Событие обязательно';
                     }
                     return null;
                   },
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(10.0),
                 child: TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -135,6 +130,26 @@ class _ActEditState extends State<EventEdit> {
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Название обязательно';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20.0),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 10,
+                  decoration: InputDecoration(
+                    labelText: "Введите описание",
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  // The validator receives the text that the user has entered.
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Описание обязательно';
                     }
                     return null;
                   },
@@ -153,13 +168,16 @@ class _ActEditState extends State<EventEdit> {
 ;                        events.doc(i.toString()).update({
                           "name": _nameController.text,
                           "type": _typeController.text,
-                          "subtype": _subtypeController.text
+                          "event": _eventController.text,
+                          "description": _descriptionController.text
                           //"type": dropdownValue
                         }).then((_) {
                           Scaffold.of(context).showSnackBar(
                               SnackBar(content: Text('Successfully Added')));
                           typeController.clear();
                           nameController.clear();
+                          eventController.clear();
+                          descriptionController.clear();
                         }).catchError((onError) {
                           Scaffold.of(context)
                               .showSnackBar(SnackBar(content: Text(onError)));
@@ -189,9 +207,9 @@ class _ActEditState extends State<EventEdit> {
   @override
   void dispose() {
     super.dispose();
-    ageController.dispose();
+    descriptionController.dispose();
     nameController.dispose();
     typeController.dispose();
-    subtypeController.dispose();
+    eventController.dispose();
   }
 }
