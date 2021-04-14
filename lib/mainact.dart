@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database_tutorial/acts_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,7 +19,7 @@ class _MyActState extends State<MyAct> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
-  var selectType, selectEvent;
+  dynamic selectType, selectEvent;
   final typeItems = ["Ритуал", "Заговор", "Оберег", "Народный рецепт", "Практический совет"];
 
   @override
@@ -35,7 +34,7 @@ class _MyActState extends State<MyAct> {
               child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   children: <Widget>[
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -58,7 +57,7 @@ class _MyActState extends State<MyAct> {
                                         style: TextStyle(color: Colors.black),
                                       ),
                                     );
-                                    Scaffold.of(context).showSnackBar(snackBar);
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectType = typeValue;
                                     });
@@ -81,12 +80,21 @@ class _MyActState extends State<MyAct> {
 
 
 
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance.collection('events').snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData)
-                            const Text("Loading.......");
+                            return
+                              SizedBox(
+                                height: 35,
+                                width: 0,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                    )
+                                )
+                            );
                           else {
                             List <DropdownMenuItem> typeSubs = [];
                             for (int i = 0; i <
@@ -102,7 +110,7 @@ class _MyActState extends State<MyAct> {
                                   value: "${snap.id}",
                                 ),
                               );
-                            };
+                            }
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -110,7 +118,7 @@ class _MyActState extends State<MyAct> {
                                   size: 25.0,
                                   color: Colors.blue,),
                                 SizedBox(width: 50.0,),
-                                DropdownButton(
+                                DropdownButton<dynamic>(
                                   items: typeSubs,
 
                                   onChanged: (subValue){
@@ -119,7 +127,7 @@ class _MyActState extends State<MyAct> {
                                         style: TextStyle(color: Colors.black),
                                       ),
                                     );
-                                    Scaffold.of(context).showSnackBar(snackBar);
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectEvent = subValue;
                                     });
@@ -135,7 +143,7 @@ class _MyActState extends State<MyAct> {
 
                           }
                         }),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
 
                     TextFormField(
                       controller: nameController,
@@ -147,11 +155,11 @@ class _MyActState extends State<MyAct> {
                           )
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
 
                     TextFormField(
                       controller: descriptionController,
-                      maxLines: 12,
+                      maxLines: 14,
                       decoration: InputDecoration(
                           labelText: 'Введите описание',
                           enabledBorder: OutlineInputBorder(
@@ -178,14 +186,14 @@ class _MyActState extends State<MyAct> {
                                 "event": selectEvent,
                                 "type": selectType
                               }).then((_) {
-                                Scaffold.of(context).showSnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text('Добавлено')));
                                 nameController.clear();
                                 descriptionController.clear();
                                 selectType.clear();
                                 selectEvent.clear();
                               }).catchError((onError) {
-                                Scaffold.of(context)
+                                ScaffoldMessenger.of(context)
                                     .showSnackBar(SnackBar(content: Text(onError)));
                               });
                             }
@@ -204,7 +212,7 @@ class _MyActState extends State<MyAct> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Home_acts(title: "Список действий")),
+                                  builder: (context) => HomeActs(title: "Список действий")),
                             );
                           },
                           child: Text('Список'),

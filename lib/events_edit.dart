@@ -1,24 +1,21 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database_tutorial/home.dart';
 import 'package:firebase_database_tutorial/events_list.dart';
 import 'package:flutter/material.dart';
 
 
-class Event_edit extends StatefulWidget {
-  Event_edit({Key key, this.nomer, this.name, this.type, this.subtype, this.title}) : super(key: key);
-  final String title;
-  final String nomer;
-  final String name;
-  final String type;
-  final String subtype;
+class EventEdit1 extends StatefulWidget {
+  EventEdit1({Key key, this.nom, this.name, this.type, this.subtype, this.title}) : super(key: key);
+  final dynamic title;
+  final dynamic  nom;
+  final dynamic name;
+  final dynamic type;
+  final dynamic subtype;
 
   @override
-  _Event_edit createState() => _Event_edit();
+  _EventEdit1 createState() => _EventEdit1();
 }
 
-class _Event_edit extends State<Event_edit> {
+class _EventEdit1 extends State<EventEdit1> {
   final events = FirebaseFirestore.instance.collection("events");
   @override
   Widget build(BuildContext context) {
@@ -37,7 +34,7 @@ class _Event_edit extends State<Event_edit> {
                       fontSize: 30,
                       fontFamily: 'Roboto',
                       fontStyle: FontStyle.italic)),
-              EventEdit(nomer: widget.nomer, name: widget.name, type: widget.type, subtype: widget.subtype),
+              EventEdit(nom: widget.nom, name: widget.name, type: widget.type, subtype: widget.subtype),
             ]),
       )),
     );
@@ -45,8 +42,8 @@ class _Event_edit extends State<Event_edit> {
 }
 
 class EventEdit extends StatefulWidget {
-  EventEdit({Key key, this.nomer, this.name, this.type, this.subtype}) : super(key: key);
-  final dynamic nomer;
+  EventEdit({Key key, this.nom, this.name, this.type, this.subtype}) : super(key: key);
+  final dynamic nom;
   final dynamic name;
   final dynamic type;
   final dynamic subtype;
@@ -67,8 +64,6 @@ class _EventEditState extends State<EventEdit> {
   Widget build(BuildContext context) {
     CollectionReference  events = FirebaseFirestore.instance.collection("events");
 
-    var order = int.parse(widget.nomer) + 1;
-
     final _nameController = TextEditingController(text: widget.name);
     final _typeController = TextEditingController(text: widget.type);
     final _subtypeController = TextEditingController(text: widget.subtype);
@@ -83,7 +78,7 @@ class _EventEditState extends State<EventEdit> {
               controller: _typeController,
               enabled: false,
               decoration: InputDecoration(
-                labelText: "Введите тип",
+                labelText: "Тип",
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
@@ -103,7 +98,7 @@ class _EventEditState extends State<EventEdit> {
                   controller: _subtypeController,
                   enabled: false,
                   decoration: InputDecoration(
-                    labelText: "Введите подтип",
+                    labelText: "Подтип",
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -122,7 +117,7 @@ class _EventEditState extends State<EventEdit> {
                 child: TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: "Введите название",
+                    labelText: "Название",
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -141,35 +136,45 @@ class _EventEditState extends State<EventEdit> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  RaisedButton(
-                    color: Colors.lightBlue,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.lightBlue,
+                      onPrimary: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 5,
+                    ),
                     onPressed: () {
                       if (_formKey2.currentState.validate()) {
-                        dynamic i = int.parse(widget.nomer)+1
+                        dynamic i = int.parse(widget.nom)+1
 ;                        events.doc(i.toString()).update({
                           "name": _nameController.text,
                           "type": _typeController.text,
                           "subtype": _subtypeController.text
                         }).then((_) {
-                          Scaffold.of(context).showSnackBar(
-                              SnackBar(content: Text('Successfully Added')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Сохранено')));
                           typeController.clear();
                           nameController.clear();
                         }).catchError((onError) {
-                          Scaffold.of(context)
+                          ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text(onError)));
                         });
                       }
                     },
                     child: Text('Сохранить'),
                   ),
-                  RaisedButton(
-                    color: Colors.amber,
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.amber,
+                      onPrimary: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 5,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Home_events(title: "Home Page")),
+                            builder: (context) => ListEvents(title: "Home Page")),
                       );
                     },
                     child: Text('Отмена'),

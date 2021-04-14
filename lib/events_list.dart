@@ -3,20 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database_tutorial/events_edit.dart';
 
-class Home_events extends StatefulWidget {
-  Home_events({Key key, this.title}) : super(key: key);
-  final String title;
+class ListEvents extends StatefulWidget {
+  ListEvents({Key key, this.title}) : super(key: key);
+  final dynamic title;
 
   @override
-  _HomeState createState() => _HomeState();
+  _ListEvents createState() => _ListEvents();
 }
 
-class _HomeState extends State<Home_events> {
+class _ListEvents extends State<ListEvents> {
   final dbRef = FirebaseDatabase.instance.reference().child("pets");
   final events = FirebaseFirestore.instance.collection("events");
 
   List<Map<dynamic, dynamic>> lists = [];
-  List<String> listid = [];
+  List<String> listId = [];
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +36,11 @@ class _HomeState extends State<Home_events> {
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasData) {
                 lists.clear();
-                listid.clear();
+                listId.clear();
                 final List<DocumentSnapshot> values = snapshot.data.docs;
                 values.asMap().forEach((key, values) {
                   lists.add(values.data());
-                  listid.add(values.id);
+                  listId.add(values.id);
                 });
                  return new ListView.builder(
                     shrinkWrap: true,
@@ -50,7 +50,7 @@ class _HomeState extends State<Home_events> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text("ID: " + listid[index]),
+                            Text("ID: " + listId[index]),
                             Text("Тип: " + lists[index]["type"]),
                             Text("Подтип: " + lists[index]["subtype"]),
                             Text("Название: " + lists[index]["name"]),
@@ -58,7 +58,7 @@ class _HomeState extends State<Home_events> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Event_edit(nomer: index.toString(), name: lists[index]["name"], type: lists[index]["type"], subtype: lists[index]["subtype"], title: "Редактирование")),
+                                    builder: (context) => EventEdit1(nom: index.toString(), name: lists[index]["name"], type: lists[index]["type"], subtype: lists[index]["subtype"], title: "Редактирование")),
                               );
                             },
                                 child: Text('Изменить'))

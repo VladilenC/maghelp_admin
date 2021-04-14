@@ -1,17 +1,16 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database_tutorial/acts_edit.dart';
 
-class Home_acts extends StatefulWidget {
-  Home_acts({Key key, this.title}) : super(key: key);
+class HomeActs extends StatefulWidget {
+  HomeActs({Key key,  this.title}) : super(key: key);
   final String title;
 
   @override
-  _HomeState createState() => _HomeState();
+  _HomeActs createState() => _HomeActs();
 }
 
-class _HomeState extends State<Home_acts> {
+class _HomeActs extends State<HomeActs> {
   final events = FirebaseFirestore.instance.collection("acts");
 
   List<Map<dynamic, dynamic>> lists = [];
@@ -58,7 +57,7 @@ class _HomeState extends State<Home_acts> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Actedit(nomer: index.toString(), name: lists[index]["name"], type: lists[index]["type"], event: lists[index]["event"], description: lists[index]["description"], title: "Редактирование")),
+                                    builder: (context) => ActEdit(nom: index.toString(), name: lists[index]["name"], type: lists[index]["type"], event: lists[index]["event"], description: lists[index]["description"], title: "Редактирование")),
                               );
                             },
                                 child: Text('Изменить'))

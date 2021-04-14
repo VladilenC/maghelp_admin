@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database_tutorial/events_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,16 +31,24 @@ class _MyEventState extends State<MyEvent> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   children: <Widget>[
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance.collection('types').snapshots(),
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData)
-                            const Text("Loading.......");
+                          if (!snapshot.hasData || snapshot.data == null) {
+                            print(snapshot);
+                            return
+                              SizedBox(
+                                  height: 36,
+                                  width: 16,
+                                  child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1.5,
+                                      )
+
+                                  ));}
+
                           else {
-                            var dd = snapshot.data.docs;
-                            print(dd);
-                          //  var dd1 = dd.collection('subs');
                             List <DropdownMenuItem> typeItems = [];
                             for (int i = 0; i <
                                 snapshot.data.docs.length; i++) {
@@ -56,7 +62,7 @@ class _MyEventState extends State<MyEvent> {
                                   value: "${snap.id}",
                                 ),
                               );
-                            };
+                            }
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -64,7 +70,7 @@ class _MyEventState extends State<MyEvent> {
                                   size: 25.0,
                                   color: Colors.blue,),
                                 SizedBox(width: 50.0,),
-                                DropdownButton(
+                                DropdownButton<dynamic>(
                                   items: typeItems,
                                   onChanged: (typeValue){
                                     final snackBar = SnackBar(
@@ -72,7 +78,7 @@ class _MyEventState extends State<MyEvent> {
                                         style: TextStyle(color: Colors.black),
                                       ),
                                     );
-                                    Scaffold.of(context).showSnackBar(snackBar);
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectType = typeValue;
                                    selectSub = null;
@@ -97,12 +103,21 @@ class _MyEventState extends State<MyEvent> {
 
 
 
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 10.0),
                     StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance.collection('types').doc(selectType).collection('subs').snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData)
-                            const Text("Loading.......");
+                            return
+                              SizedBox(
+                                height: 36,
+                                width: 16,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                    )
+                                )
+                            );
                           else {
                             List <DropdownMenuItem> typeSubs = [];
                             for (int i = 0; i <
@@ -118,7 +133,7 @@ class _MyEventState extends State<MyEvent> {
                                   value: "${snap.id}",
                                 ),
                               );
-                            };
+                            }
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -126,7 +141,7 @@ class _MyEventState extends State<MyEvent> {
                                   size: 25.0,
                                   color: Colors.blue,),
                                 SizedBox(width: 50.0,),
-                                DropdownButton(
+                                DropdownButton<dynamic>(
                                   items: typeSubs,
 
                                   onChanged: (subValue){
@@ -135,7 +150,7 @@ class _MyEventState extends State<MyEvent> {
                                         style: TextStyle(color: Colors.black),
                                       ),
                                     );
-                                    Scaffold.of(context).showSnackBar(snackBar);
+                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectSub = subValue;
                                     });
@@ -151,11 +166,11 @@ class _MyEventState extends State<MyEvent> {
 
                           }
                         }),
-SizedBox(height: 20.0),
+SizedBox(height: 10.0),
 
 TextFormField(
   controller: nameController,
-    maxLines: 15,
+    maxLines: 10,
     decoration: InputDecoration(
       labelText: 'Введите название',
       enabledBorder: OutlineInputBorder(
@@ -163,7 +178,7 @@ TextFormField(
       )
     ),
 ),
-
+                    SizedBox(height: 145.0),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: <Widget>[
@@ -182,13 +197,13 @@ TextFormField(
                                               "subtype": selectSub,
                                               "type": selectType
                                             }).then((_) {
-                                              Scaffold.of(context).showSnackBar(
+                                              ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(content: Text('Добавлено')));
                                               nameController.clear();
                                               selectType.clear();
                                               selectSub.clear();
                                             }).catchError((onError) {
-                                              Scaffold.of(context)
+                                              ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(content: Text(onError)));
                                             });
                                           }
@@ -207,7 +222,7 @@ TextFormField(
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => Home_events(title: "Список событий")),
+                                                builder: (context) => ListEvents(title: "Список событий")),
                                           );
                                         },
                                         child: Text('Список'),
