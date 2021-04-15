@@ -24,11 +24,9 @@ class _MyActState extends State<MyAct> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference  events = FirebaseFirestore.instance.collection("events");
+    CollectionReference  events = FirebaseFirestore.instance.collection("acts");
     return
       Scaffold(
-
-
           body: Form(
               key: _formKey,
               child: ListView(
@@ -50,7 +48,6 @@ class _MyActState extends State<MyAct> {
                                       child: Text(value),
                                     );
                                   }).toList(),
-
                                   onChanged: (typeValue){
                                     final snackBar = SnackBar(
                                       content: Text('Выбран тип $typeValue',
@@ -68,19 +65,9 @@ class _MyActState extends State<MyAct> {
                                     style: TextStyle(color: Colors.blue),
                                   ),
                                 ),
-
-
-
-
                               ],
                             ),
-
-
-
-
-
-
-                    SizedBox(height: 10.0),
+                   SizedBox(height: 10.0),
                     StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance.collection('events').snapshots(),
                         builder: (context, snapshot) {
@@ -100,7 +87,6 @@ class _MyActState extends State<MyAct> {
                             for (int i = 0; i <
                                 snapshot.data.docs.length; i++) {
                               DocumentSnapshot snap = snapshot.data.docs[i];
-
                               typeSubs.add(
                                 DropdownMenuItem(
                                   child: Text(
@@ -140,11 +126,9 @@ class _MyActState extends State<MyAct> {
                                 ),
                               ],
                             );
-
                           }
                         }),
                     SizedBox(height: 10.0),
-
                     TextFormField(
                       controller: nameController,
                       maxLines: 1,
@@ -156,7 +140,6 @@ class _MyActState extends State<MyAct> {
                       ),
                     ),
                     SizedBox(height: 10.0),
-
                     TextFormField(
                       controller: descriptionController,
                       maxLines: 14,
@@ -167,12 +150,10 @@ class _MyActState extends State<MyAct> {
                           )
                       ),
                     ),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
                         ElevatedButton(
-
                           style: ElevatedButton.styleFrom(
                             primary: Colors.teal,
                             onPrimary: Colors.white,
@@ -181,8 +162,9 @@ class _MyActState extends State<MyAct> {
                           ),
                           onPressed: () {
                             if (_formKey.currentState.validate()) {
-                              events.doc().set({
-                                "description": nameController.text,
+                              events.doc(nameController.text).set({
+                                "name": nameController.text,
+                                "description": descriptionController.text,
                                 "event": selectEvent,
                                 "type": selectType
                               }).then((_) {
@@ -201,7 +183,6 @@ class _MyActState extends State<MyAct> {
                           child: Text('Сохранить'),
                         ),
                         ElevatedButton(
-
                           style: ElevatedButton.styleFrom(
                             primary: Colors.amber,
                             onPrimary: Colors.white,
@@ -212,29 +193,17 @@ class _MyActState extends State<MyAct> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomeActs(title: "Список действий")),
+                                  builder: (context) => ListActs(title: "Список действий")),
                             );
                           },
                           child: Text('Список'),
                         ),
                       ],
                     ),
-
-
-
-
-
-
-
-
-
-
                   ]
               )
           )
       );
-
-
   }
 
   @override

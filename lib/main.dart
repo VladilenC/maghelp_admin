@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database_tutorial/mainevent.dart';
 import 'package:firebase_database_tutorial/mainact.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 
 
@@ -51,7 +52,7 @@ class _AppState extends State<App> {
 
     // Show a loader until FlutterFire is initialized
     if (!_initialized) {
-      return Text('Loading');
+      return MaterialApp(home: Text('Loading'));
     }
 
     return MaterialApp(
@@ -63,7 +64,8 @@ class _AppState extends State<App> {
         home: DefaultTabController(
           length: 2,
           child: Scaffold(
-            appBar: AppBar(title: Text('Магическая помощь00000000'),
+            appBar: AppBar(title: Text('Магическая помощь'),
+              centerTitle: true,
               bottom: TabBar(
                 tabs: [
                   Tab(text: 'Действия',),

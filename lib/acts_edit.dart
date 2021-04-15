@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database_tutorial/events_list.dart';
+import 'package:firebase_database_tutorial/acts_list.dart';
 import 'package:flutter/material.dart';
 
 
-class ActEdit extends StatefulWidget {
-  ActEdit({Key key,  this.nom,  this.name,  this.type,  this.event,  this.description,  this.title}) : super(key: key);
+class ActEdit1 extends StatefulWidget {
+  ActEdit1({Key key, this.nom, this.id, this.name,  this.type,  this.event,  this.description,  this.title}) : super(key: key);
   final dynamic title;
+  final dynamic id;
   final dynamic nom;
   final dynamic name;
   final dynamic type;
@@ -13,32 +14,33 @@ class ActEdit extends StatefulWidget {
   final dynamic description;
 
   @override
-  _ActEdit createState() => _ActEdit();
+  _ActEdit1 createState() => _ActEdit1();
 }
 
-class _ActEdit extends State<ActEdit> {
-  final events = FirebaseFirestore.instance.collection("events");
+class _ActEdit1 extends State<ActEdit1> {
+  //final events = FirebaseFirestore.instance.collection("events");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title+': '+widget.name),
+        title: Text(widget.title+': '+widget.id),
       ),
       body: Center(
           child: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              EventEdit(nom: widget.nom, name: widget.name, type: widget.type, event: widget.event, description: widget.description),
+              ActEdit(nom: widget.nom, id: widget.id, name: widget.name, type: widget.type, event: widget.event, description: widget.description),
             ]),
       )),
     );
   }
 }
 
-class EventEdit extends StatefulWidget {
-  EventEdit({Key key, this.nom, this.name, this.type, this.event, this.description}) : super(key: key);
+class ActEdit extends StatefulWidget {
+  ActEdit({Key key, this.nom, this.id, this.name, this.type, this.event, this.description}) : super(key: key);
   final dynamic nom;
+  final dynamic id;
   final dynamic name;
   final dynamic type;
   final dynamic event;
@@ -47,10 +49,10 @@ class EventEdit extends StatefulWidget {
 
 
   @override
-  _ActEditState createState() => _ActEditState();
+  _ActEdit1State createState() => _ActEdit1State();
 }
 
-class _ActEditState extends State<EventEdit> {
+class _ActEdit1State extends State<ActEdit> {
   final _formKey2 = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final typeController = TextEditingController();
@@ -164,8 +166,7 @@ class _ActEditState extends State<EventEdit> {
                     ),
                     onPressed: () {
                       if (_formKey2.currentState.validate()) {
-                        dynamic i = int.parse(widget.nom)+1
-;                        events.doc(i.toString()).update({
+                       events.doc(widget.id).update({
                           "name": _nameController.text,
                           "type": _typeController.text,
                           "event": _eventController.text,
@@ -196,7 +197,7 @@ class _ActEditState extends State<EventEdit> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ListEvents(title: "Home Page")),
+                            builder: (context) => ListActs(title: "Home Page")),
                       );
                     },
                     child: Text('Отмена'),
