@@ -35,8 +35,7 @@ class _MyEventState extends State<MyEvent> {
                     StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance.collection('types').snapshots(),
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData || snapshot.data == null) {
-                            print(snapshot);
+                          if (!snapshot.hasData || snapshot.data == null)
                             return
                               SizedBox(
                                   height: 36,
@@ -46,7 +45,7 @@ class _MyEventState extends State<MyEvent> {
                                         strokeWidth: 1.5,
                                       )
 
-                                  ));}
+                                  ));
 
                           else {
                             List <DropdownMenuItem> typeItems = [];
@@ -191,6 +190,9 @@ TextFormField(
                                           elevation: 5,
                                         ),
                                         onPressed: () {
+                                          if (selectType!=null && selectSub!=null && nameController.text!=null) {
+
+
                                           if (_formKey.currentState.validate()) {
                                             events.doc(nameController.text).set({
                                               "name": nameController.text,
@@ -207,7 +209,11 @@ TextFormField(
                                                   .showSnackBar(SnackBar(content: Text(onError)));
                                             });
                                           }
-                                        },
+                                        }
+                                          else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text('Не добавлено. Поля не могут быть пустыми')));
+                                          }},
                                         child: Text('Сохранить'),
                                       ),
                                       ElevatedButton(

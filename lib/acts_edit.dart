@@ -159,7 +159,7 @@ class _ActEdit1State extends State<ActEdit> {
                 children: <Widget>[
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.teal,
+                      primary: Colors.lightBlue,
                       onPrimary: Colors.white,
                       shadowColor: Colors.grey,
                       elevation: 5,
@@ -186,22 +186,22 @@ class _ActEdit1State extends State<ActEdit> {
                     },
                     child: Text('Сохранить'),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.amber,
-                      onPrimary: Colors.white,
-                      shadowColor: Colors.grey,
-                      elevation: 5,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ListActs(title: "Home Page")),
-                      );
-                    },
-                    child: Text('Отмена'),
-                  ),
+//                  ElevatedButton(
+//                    style: ElevatedButton.styleFrom(
+//                      primary: Colors.amber,
+//                      onPrimary: Colors.white,
+//                      shadowColor: Colors.grey,
+//                      elevation: 5,
+//                    ),
+//                    onPressed: () {
+//                      Navigator.push(
+//                        context,
+//                        MaterialPageRoute(
+//                            builder: (context) => ListActs(title: "Home Page")),
+//                      );
+//                    },
+//                    child: Text('Отмена'),
+//                  ),
                 ],
               ),
 

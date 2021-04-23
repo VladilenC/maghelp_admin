@@ -2,6 +2,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database_tutorial/mainevent.dart';
 import 'package:firebase_database_tutorial/mainact.dart';
+import 'package:firebase_database_tutorial/mainimage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,6 +21,7 @@ class _AppState extends State<App> {
   // Set default `_initialized` and `_error` state to false
   bool _initialized = false;
   bool _error = false;
+  int ww1;
 
   // Define an async function to initialize FlutterFire
   void initializeFlutterFire() async {
@@ -52,7 +54,16 @@ class _AppState extends State<App> {
 
     // Show a loader until FlutterFire is initialized
     if (!_initialized) {
-      return MaterialApp(home: Text('Loading'));
+      return
+        SizedBox(
+            height: 36,
+            width: 16,
+            child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                )
+            )
+        );
     }
 
     return MaterialApp(
@@ -62,7 +73,7 @@ class _AppState extends State<App> {
           primarySwatch: Colors.blue,
         ),
         home: DefaultTabController(
-          length: 2,
+          length: 3,
           child: Scaffold(
             appBar: AppBar(title: Text('Магическая помощь'),
               centerTitle: true,
@@ -70,6 +81,7 @@ class _AppState extends State<App> {
                 tabs: [
                   Tab(text: 'Действия',),
                   Tab(text: 'События',),
+                  Tab(text: 'Картинки',),
                   //   Tab(text: 'Типы')
                 ],
               ),),
@@ -77,6 +89,7 @@ class _AppState extends State<App> {
               children: [
                 MyAct(),
                 MyEvent(),
+                SecondPage(),
                 //   MyTypes(title: 'Типы')
               ],
             ),

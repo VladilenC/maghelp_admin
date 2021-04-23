@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database_tutorial/events_list.dart';
+import 'images_list.dart';
 import 'package:flutter/material.dart';
 
 
@@ -132,13 +132,24 @@ class _EventEditState extends State<EventEdit> {
                 ),
               ),
           Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Row(
+              padding: EdgeInsets.all(10.0),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.lightBlue,
+                      onPrimary: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 5,
+                    ),
+                    onPressed: null,
+                    child: Text('Выбор картинки'),
+                  ),
+                  SizedBox(height: 20.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.teal,
                       onPrimary: Colors.white,
                       shadowColor: Colors.grey,
                       elevation: 5,
@@ -163,22 +174,22 @@ class _EventEditState extends State<EventEdit> {
                     },
                     child: Text('Сохранить'),
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.amber,
-                      onPrimary: Colors.white,
-                      shadowColor: Colors.grey,
-                      elevation: 5,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ListEvents(title: "Home Page")),
-                      );
-                    },
-                    child: Text('Отмена'),
-                  ),
+//                  ElevatedButton(
+//                    style: ElevatedButton.styleFrom(
+//                      primary: Colors.amber,
+//                      onPrimary: Colors.white,
+//                      shadowColor: Colors.grey,
+//                      elevation: 5,
+//                    ),
+//                    onPressed: () {
+//                      Navigator.push(
+//                        context,
+//                        MaterialPageRoute(
+//                            builder: (context) => ListEvents(title: "Home Page")),
+//                      );
+//                    },
+//                    child: Text('Отмена'),
+//                  ),
                 ],
               ),
 

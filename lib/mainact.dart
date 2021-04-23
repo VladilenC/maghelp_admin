@@ -161,8 +161,9 @@ class _MyActState extends State<MyAct> {
                             elevation: 5,
                           ),
                           onPressed: () {
+                            if (selectType!=null && selectEvent!=null && descriptionController.text!=null) {
                             if (_formKey.currentState.validate()) {
-                              events.doc(nameController.text).set({
+                              events.doc().set({
                                 "name": nameController.text,
                                 "description": descriptionController.text,
                                 "event": selectEvent,
@@ -179,7 +180,12 @@ class _MyActState extends State<MyAct> {
                                     .showSnackBar(SnackBar(content: Text(onError)));
                               });
                             }
-                          },
+                          }
+                            else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Не добавлено. Поля не могут быть пустыми')));
+                            }
+                            },
                           child: Text('Сохранить'),
                         ),
                         ElevatedButton(
