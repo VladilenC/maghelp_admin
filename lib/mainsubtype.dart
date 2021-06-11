@@ -4,27 +4,30 @@ import 'package:maghelp_add_act/List/events_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:maghelp_add_act/List/subtypes_list.dart';
 import 'List/images_list.dart';
 
 
 
-class MyEvent extends StatefulWidget {
-  MyEvent({Key key}) : super(key: key);
+class MySubType extends StatefulWidget {
+  MySubType({Key key}) : super(key: key);
 
   @override
-  _MyEventState createState() => _MyEventState();
+  _MySubTypeState createState() => _MySubTypeState();
 }
 
-class _MyEventState extends State<MyEvent> {
+class _MySubTypeState extends State<MySubType> {
   final _formKey = GlobalKey<FormState>();
+  CollectionReference  types = FirebaseFirestore.instance.collection("types");
+  CollectionReference  subtypes = FirebaseFirestore.instance.collection("subtypes");
+
   var nameController = TextEditingController();
   var descriptionController = TextEditingController();
-  var selectType, _url, url, _pic, _description, _name, selectSub, selectEv;
+  var selectType, selectSub, url, _url;
   List desItems, urlItems, nameItems, idItems;
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference  events = FirebaseFirestore.instance.collection("events");
     return
     Scaffold(
    body: Form(
@@ -81,7 +84,7 @@ class _MyEventState extends State<MyEvent> {
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectType = typeValue;
-                                   selectSub = null;
+                                      selectSub = null;
                                     });
                                   },
                                   value: selectType,
@@ -101,84 +104,24 @@ class _MyEventState extends State<MyEvent> {
                           if (!snapshot.hasData)
                             return
                               SizedBox(
-                                  height: 36,
-                                  width: 16,
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                      )
-                                  )
-                              );
-                          else {
-                            List <DropdownMenuItem> subItems = [];
-                            for (int i = 0; i <
-                                snapshot.data.docs.length; i++) {
-                              DocumentSnapshot snap = snapshot.data.docs[i];
-                              subItems.add(
-                                DropdownMenuItem(
-                                  child: Text(
-                                    snap['name'],
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  value: "${snap.id}",
-                                ),
-                              );
-                            }
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.check,
-                                  size: 25.0,
-                                  color: Colors.blue,),
-                                SizedBox(width: 50.0,),
-                                DropdownButton<dynamic>(
-                                  items: subItems,
-                                  onChanged: (subValue){
-                                    final snackBar = SnackBar(
-                                      content: Text('Выбран подтип $subValue',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                    setState(() {
-                                      selectSub = subValue;
-                                    });
-                                  },
-                                  value: selectSub,
-                                  isExpanded: false,
-                                  hint: Text('Выберите подтип',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
-                              ],
+                                height: 36,
+                                width: 16,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 1.5,
+                                    )
+                                )
                             );
-                          }
-                        }),
-                    StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('events').where('subtype', isEqualTo: selectSub).snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData)
-                            return
-                              SizedBox(
-                                  height: 36,
-                                  width: 16,
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                      )
-                                  )
-                              );
                           else {
-                            List <DropdownMenuItem> eventItems = [];
+                            List <DropdownMenuItem> typeSubs = [];
                             desItems = [];
                             urlItems = [];
                             nameItems = [];
-                            idItems =[];
-                            print('000');
+                            idItems = [];
                             for (int i = 0; i <
                                 snapshot.data.docs.length; i++) {
                               DocumentSnapshot snap = snapshot.data.docs[i];
-                              eventItems.add(
+                              typeSubs.add(
                                 DropdownMenuItem(
                                   child: Text(
                                     snap['name'],
@@ -190,7 +133,7 @@ class _MyEventState extends State<MyEvent> {
                               snap['description'] != null ? desItems.add(snap['description']): desItems.add('');
                               snap['url'] != null ? urlItems.add(snap['url']): urlItems.add('');
                               snap['name'] != null ? nameItems.add(snap['name']): nameItems.add('');
-                              snap.id != null ? idItems.add(snap.id): idItems.add('');
+                              idItems.add(snap.id);
                             }
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -200,25 +143,28 @@ class _MyEventState extends State<MyEvent> {
                                   color: Colors.blue,),
                                 SizedBox(width: 50.0,),
                                 DropdownButton<dynamic>(
-                                  items: eventItems,
-                                  onChanged: (evValue){
+                                  items: typeSubs,
+                                  onChanged: (subValue){
                                     final snackBar = SnackBar(
-                                      content: Text('Выбрано событие $evValue',
+                                      content: Text('Выбран подтип $subValue',
                                         style: TextStyle(color: Colors.black),
                                       ),
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
-                                      selectEv = evValue;
-                                      var _i = idItems.indexOf(evValue);
+                                      selectSub = subValue;
+
+                                       var _i = idItems.indexOf(subValue.toString());
                                       nameController.text = nameItems[_i];
                                       descriptionController.text = desItems[_i];
                                       url = urlItems[_i];
+
+
                                     });
                                   },
-                                  value: selectEv,
+                                  value: selectSub,
                                   isExpanded: false,
-                                  hint: Text('Выберите событие',
+                                  hint: Text('Выберите подтип',
                                     style: TextStyle(color: Colors.blue),
                                   ),
                                 ),
@@ -238,11 +184,26 @@ TextFormField(
       )
     ),
 ),
+                    SizedBox(height: 10.0),
 
-              Padding(
-               padding: EdgeInsets.all(5.0),
-                child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
 
+
+                    TextFormField(
+                      controller: descriptionController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                          labelText: 'Введите описание',
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0)
+                          )
+                      ),
+                    ),
+
+                    Padding(
+                        padding: EdgeInsets.all(5.0),
+                        //             child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
+                        child: _url!=null ? Image.network(_url) : (url != null ? Image.network(url): Text('Не выбрано'))
+                    ),
               Padding(
                 padding: EdgeInsets.all(5.0),
                    child: Column(
@@ -264,7 +225,6 @@ TextFormField(
                         );
                       setState(() {
 _url = _url0['url'];
-//_pic = _url0['pic'];
                       });
                   })])),
                     SizedBox(height: 5.0),
@@ -281,22 +241,19 @@ _url = _url0['url'];
                                         onPressed: () {
                                           if (selectType!=null && selectSub!=null && nameController.text!=null) {
                                          if (_formKey.currentState.validate()) {
-                                            events.doc().set({
+                                            subtypes.doc().set({
                                               "name": nameController.text,
                                               "description": descriptionController.text,
-                                              "subtype": selectSub,
-                                              "type": selectType,
-                                              'url': _url,
-  //                                            "pic": _pic
+                                              "typeid": selectType,
+                                              'url': _url
                                             }).then((_) {
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(content: Text('Добавлено')));
                                               nameController.clear();
-                                              descriptionController.clear();
                                               selectType.clear();
                                               selectSub.clear();
+                                              descriptionController.clear();
                                               _url = null;
-    //                                          _pic = null;
                                             }).catchError((onError) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(content: Text(onError)));
@@ -308,12 +265,11 @@ _url = _url0['url'];
                                                 SnackBar(content: Text('Не добавлено. Поля не могут быть пустыми')));
                                           }
                                           setState(() {
-      //                                      _url = null;
-    //                                        _pic = null;
+         //                                   _url = null;
                                           });},
                                         child: Text('Добавить'),
                                       ),
-                                      selectEv != null ? ElevatedButton(
+                                      selectSub != null ? ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.teal,
                                           onPrimary: Colors.white,
@@ -323,9 +279,10 @@ _url = _url0['url'];
                                         onPressed: () {
                                           if (selectType!=null && selectSub!=null && nameController.text!=null) {
                                             if (_formKey.currentState.validate()) {
-                                              events.doc(selectEv).update({
+                                              subtypes.doc(selectSub).update({
                                                 "name": nameController.text,
                                                 "description": descriptionController.text,
+                                                "typeid": selectType,
                                                 'url': _url != null ? _url: url,
                                               }).then((_) {
                                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -361,7 +318,7 @@ _url = _url0['url'];
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => ListEvents(title: "Список событий")),
+                                                builder: (context) => ListSubtypes(title: "Список подтипов")),
                                           );
                                         },
                                         child: Text('Список'),
@@ -378,6 +335,5 @@ _url = _url0['url'];
   void dispose() {
     super.dispose();
     nameController.dispose();
-    descriptionController.dispose();
   }
 }

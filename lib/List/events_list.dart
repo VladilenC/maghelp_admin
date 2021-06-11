@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database_tutorial/events_edit.dart';
+import 'package:maghelp_add_act/Edit/event_edit.dart';
 
 class ListEvents extends StatefulWidget {
   ListEvents({Key key, this.title}) : super(key: key);
@@ -18,6 +18,9 @@ class _ListEvents extends State<ListEvents> {
 
   @override
   Widget build(BuildContext context) {
+    CollectionReference events = FirebaseFirestore.instance.collection("events");
+    var _ev;
+
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
@@ -39,7 +42,9 @@ class _ListEvents extends State<ListEvents> {
                 values.asMap().forEach((key, values) {
                   lists.add(values.data());
                   listId.add(values.id);
+
                 });
+
                  return new ListView.builder(
                     shrinkWrap: true,
                     itemCount: lists.length,
@@ -52,12 +57,18 @@ class _ListEvents extends State<ListEvents> {
                             Text("Тип: " + lists[index]["type"]),
                             Text("Подтип: " + lists[index]["subtype"]),
                             Text("Название: " + lists[index]["name"]),
-                            ElevatedButton(onPressed:  () {
-                              Navigator.push(
+                            snapshot.data.docs[index]["url"]!=null ? Image.network(snapshot.data.docs[index]["url"]):Text('Нет картинки'),
+                            ElevatedButton(onPressed:  () async {
+
+
+                             _ev = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => EventEdit1(nom: index.toString(), name: lists[index]["name"], type: lists[index]["type"], subtype: lists[index]["subtype"], title: "Редактирование")),
+                                    builder: (context) => EventEdit1(nom: index.toString(), url: snapshot.data.docs[index]["url"], id: listId[index] ,name: lists[index]["name"], type: lists[index]["type"], subtype: lists[index]["subtype"], title: "Редактирование")),
                               );
+                              setState(() {
+
+                              });
                             },
                                 child: Text('Изменить'))
                           ],

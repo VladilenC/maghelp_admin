@@ -1,30 +1,29 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:maghelp_add_act/List/events_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'List/types_list.dart';
 import 'List/images_list.dart';
 
 
-
-class MyEvent extends StatefulWidget {
-  MyEvent({Key key}) : super(key: key);
+class MyType extends StatefulWidget {
+  MyType({Key key}) : super(key: key);
 
   @override
-  _MyEventState createState() => _MyEventState();
+  _MyTypeState createState() => _MyTypeState();
 }
 
-class _MyEventState extends State<MyEvent> {
+class _MyTypeState extends State<MyType> {
   final _formKey = GlobalKey<FormState>();
+  CollectionReference  types = FirebaseFirestore.instance.collection("types");
   var nameController = TextEditingController();
   var descriptionController = TextEditingController();
-  var selectType, _url, url, _pic, _description, _name, selectSub, selectEv;
+  var selectType, _url, url;
   List desItems, urlItems, nameItems, idItems;
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference  events = FirebaseFirestore.instance.collection("events");
+
     return
     Scaffold(
    body: Form(
@@ -50,6 +49,10 @@ class _MyEventState extends State<MyEvent> {
 
                           else {
                             List <DropdownMenuItem> typeItems = [];
+                            desItems = [];
+                            urlItems = [];
+                            nameItems = [];
+                            idItems =[];
                             for (int i = 0; i <
                                 snapshot.data.docs.length; i++) {
                               DocumentSnapshot snap = snapshot.data.docs[i];
@@ -62,6 +65,11 @@ class _MyEventState extends State<MyEvent> {
                                   value: "${snap.id}",
                                 ),
                               );
+                              snap['description'] != null ? desItems.add(snap['description']): desItems.add('');
+                              snap['url'] != null ? urlItems.add(snap['url']): urlItems.add('');
+                              snap['name'] != null ? nameItems.add(snap['name']): nameItems.add('');
+                              snap.id != null ? idItems.add(snap.id): idItems.add('');
+                 //             idItems.add(snap.id);
                             }
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +89,10 @@ class _MyEventState extends State<MyEvent> {
                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                     setState(() {
                                       selectType = typeValue;
-                                   selectSub = null;
+                                      var _i = idItems.indexOf(typeValue);
+                                      nameController.text = nameItems[_i];
+                                      descriptionController.text = desItems[_i];
+                                      url = urlItems[_i];
                                     });
                                   },
                                   value: selectType,
@@ -95,138 +106,8 @@ class _MyEventState extends State<MyEvent> {
                           }
                         }),
                     SizedBox(height: 10.0),
-                    StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('subtypes').where('typeid', isEqualTo: selectType).snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData)
-                            return
-                              SizedBox(
-                                  height: 36,
-                                  width: 16,
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                      )
-                                  )
-                              );
-                          else {
-                            List <DropdownMenuItem> subItems = [];
-                            for (int i = 0; i <
-                                snapshot.data.docs.length; i++) {
-                              DocumentSnapshot snap = snapshot.data.docs[i];
-                              subItems.add(
-                                DropdownMenuItem(
-                                  child: Text(
-                                    snap['name'],
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  value: "${snap.id}",
-                                ),
-                              );
-                            }
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.check,
-                                  size: 25.0,
-                                  color: Colors.blue,),
-                                SizedBox(width: 50.0,),
-                                DropdownButton<dynamic>(
-                                  items: subItems,
-                                  onChanged: (subValue){
-                                    final snackBar = SnackBar(
-                                      content: Text('Выбран подтип $subValue',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                    setState(() {
-                                      selectSub = subValue;
-                                    });
-                                  },
-                                  value: selectSub,
-                                  isExpanded: false,
-                                  hint: Text('Выберите подтип',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                        }),
-                    StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance.collection('events').where('subtype', isEqualTo: selectSub).snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData)
-                            return
-                              SizedBox(
-                                  height: 36,
-                                  width: 16,
-                                  child: Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                      )
-                                  )
-                              );
-                          else {
-                            List <DropdownMenuItem> eventItems = [];
-                            desItems = [];
-                            urlItems = [];
-                            nameItems = [];
-                            idItems =[];
-                            print('000');
-                            for (int i = 0; i <
-                                snapshot.data.docs.length; i++) {
-                              DocumentSnapshot snap = snapshot.data.docs[i];
-                              eventItems.add(
-                                DropdownMenuItem(
-                                  child: Text(
-                                    snap['name'],
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                  value: "${snap.id}",
-                                ),
-                              );
-                              snap['description'] != null ? desItems.add(snap['description']): desItems.add('');
-                              snap['url'] != null ? urlItems.add(snap['url']): urlItems.add('');
-                              snap['name'] != null ? nameItems.add(snap['name']): nameItems.add('');
-                              snap.id != null ? idItems.add(snap.id): idItems.add('');
-                            }
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(FontAwesomeIcons.check,
-                                  size: 25.0,
-                                  color: Colors.blue,),
-                                SizedBox(width: 50.0,),
-                                DropdownButton<dynamic>(
-                                  items: eventItems,
-                                  onChanged: (evValue){
-                                    final snackBar = SnackBar(
-                                      content: Text('Выбрано событие $evValue',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                    setState(() {
-                                      selectEv = evValue;
-                                      var _i = idItems.indexOf(evValue);
-                                      nameController.text = nameItems[_i];
-                                      descriptionController.text = desItems[_i];
-                                      url = urlItems[_i];
-                                    });
-                                  },
-                                  value: selectEv,
-                                  isExpanded: false,
-                                  hint: Text('Выберите событие',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }
-                        }),
-SizedBox(height: 10.0),
+
+
 
 TextFormField(
   controller: nameController,
@@ -238,10 +119,26 @@ TextFormField(
       )
     ),
 ),
+                    SizedBox(height: 10.0),
+
+
+
+                    TextFormField(
+                      controller: descriptionController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                          labelText: 'Введите описание',
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0)
+                          )
+                      ),
+                    ),
 
               Padding(
                padding: EdgeInsets.all(5.0),
-                child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
+   //             child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
+               child: _url!=null ? Image.network(_url) : (url != null ? Image.network(url): Text('Не выбрано'))
+              ),
 
               Padding(
                 padding: EdgeInsets.all(5.0),
@@ -264,7 +161,6 @@ TextFormField(
                         );
                       setState(() {
 _url = _url0['url'];
-//_pic = _url0['pic'];
                       });
                   })])),
                     SizedBox(height: 5.0),
@@ -279,24 +175,19 @@ _url = _url0['url'];
                                           elevation: 5,
                                         ),
                                         onPressed: () {
-                                          if (selectType!=null && selectSub!=null && nameController.text!=null) {
+                                          if (nameController.text!=null) {
                                          if (_formKey.currentState.validate()) {
-                                            events.doc().set({
+                                            types.doc().set({
                                               "name": nameController.text,
                                               "description": descriptionController.text,
-                                              "subtype": selectSub,
-                                              "type": selectType,
-                                              'url': _url,
-  //                                            "pic": _pic
+                                              'url': _url
                                             }).then((_) {
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                   SnackBar(content: Text('Добавлено')));
                                               nameController.clear();
-                                              descriptionController.clear();
                                               selectType.clear();
-                                              selectSub.clear();
+                                              descriptionController.clear();
                                               _url = null;
-    //                                          _pic = null;
                                             }).catchError((onError) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(content: Text(onError)));
@@ -305,15 +196,15 @@ _url = _url0['url'];
                                         }
                                           else {
                                             ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Не добавлено. Поля не могут быть пустыми')));
+                                                SnackBar(content: Text('Не добавлено. Название не может быть пустым')));
                                           }
                                           setState(() {
-      //                                      _url = null;
-    //                                        _pic = null;
+                          //                  _url = null;r
                                           });},
                                         child: Text('Добавить'),
                                       ),
-                                      selectEv != null ? ElevatedButton(
+
+                                      selectType != null ? ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.teal,
                                           onPrimary: Colors.white,
@@ -321,9 +212,9 @@ _url = _url0['url'];
                                           elevation: 5,
                                         ),
                                         onPressed: () {
-                                          if (selectType!=null && selectSub!=null && nameController.text!=null) {
+                                          if (nameController.text!=null) {
                                             if (_formKey.currentState.validate()) {
-                                              events.doc(selectEv).update({
+                                              types.doc(selectType).update({
                                                 "name": nameController.text,
                                                 "description": descriptionController.text,
                                                 'url': _url != null ? _url: url,
@@ -332,7 +223,6 @@ _url = _url0['url'];
                                                     SnackBar(content: Text('Изменено')));
                                                 nameController.clear();
                                                 selectType.clear();
-                                                selectSub.clear();
                                                 descriptionController.clear();
                                                 _url = null;
                                               }).catchError((onError) {
@@ -343,13 +233,13 @@ _url = _url0['url'];
                                           }
                                           else {
                                             ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(content: Text('Не изменено. название не может быть пустым')));
+                                                SnackBar(content: Text('Не изменено. Название не может быть пустым')));
                                           }
                                           setState(() {
-                                            //                                   _url = null;
+                                            //                  _url = null;
                                           });},
                                         child: Text('Изменить'),
-                                      ): Text(''),
+                                      ):Text(''),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.amber,
@@ -361,7 +251,7 @@ _url = _url0['url'];
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => ListEvents(title: "Список событий")),
+                                                builder: (context) => ListTypes(title: "Список типов")),
                                           );
                                         },
                                         child: Text('Список'),
@@ -377,7 +267,6 @@ _url = _url0['url'];
   @override
   void dispose() {
     super.dispose();
-    nameController.dispose();
-    descriptionController.dispose();
+  //  nameController.dispose();
   }
 }

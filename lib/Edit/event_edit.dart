@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'images_list.dart';
+import '../List/images_list.dart';
 import 'package:flutter/material.dart';
 
 
 class EventEdit1 extends StatefulWidget {
-  EventEdit1({Key key, this.nom, this.name, this.type, this.subtype, this.title}) : super(key: key);
+  EventEdit1({Key key, this.nom, this.id, this.name, this.type, this.subtype, this.title, this.url}) : super(key: key);
   final dynamic title;
   final dynamic  nom;
+  final dynamic id;
   final dynamic name;
   final dynamic type;
   final dynamic subtype;
+  final dynamic url;
 
   @override
   _EventEdit1 createState() => _EventEdit1();
@@ -34,7 +36,7 @@ class _EventEdit1 extends State<EventEdit1> {
                       fontSize: 30,
                       fontFamily: 'Roboto',
                       fontStyle: FontStyle.italic)),
-              EventEdit(nom: widget.nom, name: widget.name, type: widget.type, subtype: widget.subtype),
+              EventEdit(nom: widget.nom, url: widget.url, id: widget.id, name: widget.name, type: widget.type, subtype: widget.subtype),
             ]),
       )),
     );
@@ -42,11 +44,13 @@ class _EventEdit1 extends State<EventEdit1> {
 }
 
 class EventEdit extends StatefulWidget {
-  EventEdit({Key key, this.nom, this.name, this.type, this.subtype}) : super(key: key);
+  EventEdit({Key key, this.nom, this.id, this.name, this.type, this.subtype, this.url}) : super(key: key);
   final dynamic nom;
+  final dynamic id;
   final dynamic name;
   final dynamic type;
   final dynamic subtype;
+  final dynamic url;
 
 
 
@@ -59,21 +63,26 @@ class _EventEditState extends State<EventEdit> {
   final nameController = TextEditingController();
   final typeController = TextEditingController();
   final subtypeController = TextEditingController();
+  var _url;
+  var _pic;
+  var _nameController0;
 
   @override
   Widget build(BuildContext context) {
     CollectionReference  events = FirebaseFirestore.instance.collection("events");
 
-    final _nameController = TextEditingController(text: widget.name);
+    final _nameController = _nameController0!=null ? _nameController0 : TextEditingController(text: widget.name);
+
     final _typeController = TextEditingController(text: widget.type);
     final _subtypeController = TextEditingController(text: widget.subtype);
+
 
     return Form(
         key: _formKey2,
     child: SingleChildScrollView(
             child: Column(children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(5.0),
             child: TextFormField(
               controller: _typeController,
               enabled: false,
@@ -93,7 +102,7 @@ class _EventEditState extends State<EventEdit> {
             ),
           ),
               Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(5.0),
                 child: TextFormField(
                   controller: _subtypeController,
                   enabled: false,
@@ -113,7 +122,7 @@ class _EventEditState extends State<EventEdit> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(5.0),
                 child: TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -131,22 +140,36 @@ class _EventEditState extends State<EventEdit> {
                   },
                 ),
               ),
-          Padding(
-              padding: EdgeInsets.all(10.0),
+            Padding(
+            padding: EdgeInsets.all(5.0),
+              child: _url!=null ? Image.network(_url) : widget.url!=null ? Image.network(widget.url):Text('Нет картинки')),
+             Padding(
+              padding: EdgeInsets.all(5.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.lightBlue,
-                      onPrimary: Colors.white,
-                      shadowColor: Colors.grey,
-                      elevation: 5,
-                    ),
-                    onPressed: null,
-                    child: Text('Выбор картинки'),
-                  ),
-                  SizedBox(height: 20.0),
+                      child: Text("Выбор картинки"),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.amber,
+                        onPrimary: Colors.white,
+                        shadowColor: Colors.grey,
+                        elevation: 5,
+                      ),
+                      onPressed: () async {
+
+                        var _url0 = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ListImages(title: "Выбор картинки", id: null)),
+                        );                        setState(() {
+_url = _url0['url'];
+_pic = _url0['pic'];
+_nameController0 = _nameController;
+                        });
+
+                      }),
+                  SizedBox(height: 10.0),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       primary: Colors.teal,
@@ -155,12 +178,16 @@ class _EventEditState extends State<EventEdit> {
                       elevation: 5,
                     ),
                     onPressed: () {
+                      setState(() {
+
+                      });
                       if (_formKey2.currentState.validate()) {
-                        dynamic i = int.parse(widget.nom)+1
-;                        events.doc(i.toString()).update({
+                        dynamic i = int.parse(widget.nom)+1;
+;                        events.doc(widget.id).update({
                           "name": _nameController.text,
-                          "type": _typeController.text,
-                          "subtype": _subtypeController.text
+                          "url": _url!=null ? _url : widget.url,
+                          "pic": _url!=null ? _pic : null
+                         // "subtype": _subtypeController.text
                         }).then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Сохранено')));
@@ -170,7 +197,11 @@ class _EventEditState extends State<EventEdit> {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text(onError)));
                         });
+
                       }
+                      Navigator.pop(
+                        context
+                      );
                     },
                     child: Text('Сохранить'),
                   ),

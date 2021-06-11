@@ -1,10 +1,15 @@
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database_tutorial/mainevent.dart';
-import 'package:firebase_database_tutorial/mainact.dart';
-import 'package:firebase_database_tutorial/mainimage.dart';
+import 'package:maghelp_add_act/mainsubtype.dart';
+import 'package:maghelp_add_act/mainevent.dart';
+import 'package:maghelp_add_act/mainact.dart';
+import 'package:maghelp_add_act/mainimage.dart';
+import 'package:maghelp_add_act/mainimageweb.dart';
+import 'package:maghelp_add_act/mainimageweb2.dart';
+import 'package:maghelp_add_act/mainimageweb3.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:maghelp_add_act/maintype.dart';
 
 
 
@@ -73,24 +78,31 @@ class _AppState extends State<App> {
           primarySwatch: Colors.blue,
         ),
         home: DefaultTabController(
-          length: 3,
+          length: 7,
           child: Scaffold(
             appBar: AppBar(title: Text('Магическая помощь'),
               centerTitle: true,
               bottom: TabBar(
                 tabs: [
-                  Tab(text: 'Действия',),
-                  Tab(text: 'События',),
-                  Tab(text: 'Картинки',),
+                  Tab(text: 'Типы'),
+                  Tab(text: 'Подтипы'),
+                  Tab(text: 'События'),
+                  Tab(text: 'Действия'),
+                  Tab(text: 'Картинки'),
+                  Tab(text: 'Картинки в тексте'),
+                  Tab(text: 'Аксессуары')
                   //   Tab(text: 'Типы')
                 ],
               ),),
             body: TabBarView(
               children: [
-                MyAct(),
+                MyType(),
+                MySubType(),
                 MyEvent(),
-                SecondPage(),
-                //   MyTypes(title: 'Типы')
+                MyAct(),
+                MyPic(),
+                MyPic2(),
+                MyPic3()
               ],
             ),
           ),

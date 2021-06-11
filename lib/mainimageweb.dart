@@ -1,22 +1,35 @@
-import 'dart:io';
+
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase/firebase.dart' as Firebase;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'package:image_picker_for_web/image_picker_for_web.dart';
+import 'dart:async';
+import 'dart:io';
 import 'List/images_list.dart';
+import 'package:mime_type/mime_type.dart';
+import 'package:path/path.dart' as Path;
 
-class SecondPage extends StatefulWidget {
-  SecondPage({Key key}) : super(key: key);
+
+class MyPic extends StatefulWidget {
+  MyPic({Key key}) : super(key: key);
 
   @override
-  _SecondPageState createState() => _SecondPageState();
+  _MyPicState createState() => _MyPicState();
 }
 
-class _SecondPageState extends State<SecondPage> {
+class _MyPicState extends State<MyPic> {
   final FirebaseFirestore fb = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   File _image;
+  Image _web;
+  Image _web2;
+  Uint8List _uiWeb;
+  MediaInfo _media;
   bool isLoading = false;
   bool isRetrieved = false;
   QuerySnapshot cachedResult;
@@ -52,12 +65,11 @@ class _SecondPageState extends State<SecondPage> {
           SizedBox(height: 5.0),
           /// TODO: cache images correctly
           ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
-          _image == null
+          _web2 == null
               ? Text('Картинка не выбрана.')
-              : Image.file(
-                  _image,
-                  height: 300,
-                ),
+              : _web2,
+
+
           !isLoading
               ? ElevatedButton(
                   child: Text("Сохранить"),
@@ -68,28 +80,42 @@ class _SecondPageState extends State<SecondPage> {
                 elevation: 5,
               ),
                   onPressed: () async {
-                    if (_image != null) {
+                    if (_web2 != null) {
+                      Reference ref = FirebaseStorage.instance.ref();
+
+                      String mimeType = mime(Path.basename(_media.fileName));
+                      final String extension = extensionFromMime(mimeType);
+                      Firebase.StorageReference storageReference =
+                      Firebase.storage().ref().child("image/"+nameController.text + ".$extension");
+
+                      var metadata = Firebase.UploadMetadata(
+                        contentType: mimeType,
+                      );
+
+
+                      var addImg = await storageReference.put(_uiWeb, metadata).future;
+
                       setState(() {
                         this.isLoading = true;
                       });
-                      Reference ref = FirebaseStorage.instance.ref();
-                      TaskSnapshot addImg =
-                          await ref.child("image/"+nameController.text).putFile(_image);
-                      if (addImg.state == TaskState.success) {
+
+                      if (addImg.state == Firebase.TaskState.SUCCESS) {
+                        final   downloadUrl = await storageReference.getDownloadURL();
+
                         setState(() {
                           this.isLoading = false;
                         });
-                        final String downloadUrl = await addImg.ref.getDownloadURL();
 
                         await FirebaseFirestore.instance
                             .collection('images')
-                            .add({'url': downloadUrl, 'name': nameController.text});
+                            .add({'url': downloadUrl.toString(), 'name': nameController.text});
                         setState(() {
                           this.isLoading = false;
                         });
                         print("Добавлено");
                         nameController.clear();
-                        _image=null;
+                        _web2=null;
+                        _media = null;
                       }
                     }
                   })
@@ -122,11 +148,13 @@ class _SecondPageState extends State<SecondPage> {
   }
 
   Future getImage() async {
-    final _picker = ImagePicker();
-    var image = await _picker.getImage(source: ImageSource.gallery);
+    MediaInfo mediaInfo = await ImagePickerWeb.getImageInfo;
 
     setState(() {
-      _image = File(image.path);
+      _media = mediaInfo;
+      _uiWeb = mediaInfo.data;
+ //     _web = image;
+      _web2 = Image.memory(mediaInfo.data);
     });
   }
 
