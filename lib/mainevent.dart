@@ -241,7 +241,7 @@ TextFormField(
 
               Padding(
                padding: EdgeInsets.all(5.0),
-                child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
+                child: _url!=null ? Image.network(_url) : url != null ? Image.network(url):Text('Нет картинки')),
 
               Padding(
                 padding: EdgeInsets.all(5.0),
@@ -361,7 +361,7 @@ _url = _url0['url'];
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => ListEvents(title: "Список событий")),
+                                                builder: (context) => ListEvents(title: "Список событий", subtype: selectSub)),
                                           );
                                         },
                                         child: Text('Список'),

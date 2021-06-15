@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:maghelp_add_act/Edit/event_edit.dart';
 
 class ListEvents extends StatefulWidget {
-  ListEvents({Key key, this.title}) : super(key: key);
-  final dynamic title;
+  ListEvents({Key key, this.title, this.subtype}) : super(key: key);
+  final dynamic title, subtype;
 
   @override
   _ListEvents createState() => _ListEvents();
@@ -26,7 +26,7 @@ class _ListEvents extends State<ListEvents> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<QuerySnapshot>(
-             future: events.get().then((querySnapshot) {
+             future: events.where('subtype',isEqualTo: widget.subtype).get().then((querySnapshot) {
                querySnapshot.docs.forEach((result) {
 
                }

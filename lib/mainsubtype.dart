@@ -318,8 +318,8 @@ _url = _url0['url'];
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => ListSubtypes(title: "Список подтипов")),
-                                          );
+                                                builder: (context) => ListSubtypes(title: "Список подтипов", type: selectType),
+                                          ));
                                         },
                                         child: Text('Список'),
                                       ),

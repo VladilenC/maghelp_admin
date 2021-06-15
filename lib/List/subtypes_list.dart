@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../Edit/type_edit.dart';
+import '../Edit/subtype_edit.dart';
 
 class ListSubtypes extends StatefulWidget {
-  ListSubtypes({Key key, this.title}) : super(key: key);
-  final dynamic title;
+  ListSubtypes({Key key, this.title, this.type}) : super(key: key);
+  final dynamic title,type;
 
   @override
   _ListSubtypes createState() => _ListSubtypes();
@@ -27,7 +27,7 @@ class _ListSubtypes extends State<ListSubtypes> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<QuerySnapshot>(
-             future: subtypes.get().then((querySnapshot) {
+             future: subtypes.where('typeid',isEqualTo: widget.type).get().then((querySnapshot) {
                querySnapshot.docs.forEach((result) {
 
 
@@ -88,7 +88,7 @@ class _ListSubtypes extends State<ListSubtypes> {
                              _ev = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => TypeEdit1(nom: index.toString(), url: snapshot.data.docs[index]["url"], id: listId[index] ,name: lists[index]["name"], description: lists[index]["description"], title: "Редактирование")),
+                                    builder: (context) => SubEdit1(nom: index.toString(), url: snapshot.data.docs[index]["url"], id: listId[index] ,name: lists[index]["name"], description: lists[index]["description"], title: "Редактирование")),
                               );
                               setState(() {
 
