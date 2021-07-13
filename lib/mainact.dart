@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:maghelp_add_act/List/accessories_list.dart';
+import 'package:maghelp_add_act/List/accessories_act_list.dart';
 import 'package:maghelp_add_act/List/acts_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -158,7 +158,7 @@ class _MyActState extends State<MyAct> {
 
                     Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: _url!=null ? Image.network(_url) : Text('Нет картинки')),
+                        child: _url!=null ? Image.network(_url) : Text('Нет картинки',textAlign: TextAlign.center)),
 
                     Padding(
                         padding: EdgeInsets.all(5.0),
@@ -198,7 +198,7 @@ class _MyActState extends State<MyAct> {
 
                     Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: _url2!=null ? Image.network(_url2) : Text('Нет картинки')),
+                        child: _url2!=null ? Image.network(_url2) : Text('Нет картинки',textAlign: TextAlign.center)),
 
                     Padding(
                         padding: EdgeInsets.all(5.0),
@@ -238,7 +238,7 @@ class _MyActState extends State<MyAct> {
 
                     Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: _url3!=null ? Image.network(_url) : Text('Нет картинки')),
+                        child: _url3!=null ? Image.network(_url) : Text('Нет картинки',textAlign: TextAlign.center)),
 
                     Padding(
                         padding: EdgeInsets.all(5.0),

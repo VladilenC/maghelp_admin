@@ -66,7 +66,7 @@ class _MyPic2State extends State<MyPic2> {
           /// TODO: cache images correctly
           ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
           _web2 == null
-              ? Text('Картинка не выбрана.')
+              ? Text('Картинка не выбрана.',textAlign: TextAlign.center)
               : _web2,
 
 

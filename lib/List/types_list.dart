@@ -25,7 +25,7 @@ class _ListTypes extends State<ListTypes> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<QuerySnapshot>(
-             future: types.get().then((querySnapshot) {
+             future: types.orderBy('name').get().then((querySnapshot) {
                querySnapshot.docs.forEach((result) {
 //_et = result.id;
 //types.doc(_et).update({'name': _et, 'description': '', 'url': '' }) ;

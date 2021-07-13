@@ -26,7 +26,7 @@ class _ListEvents extends State<ListEvents> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<QuerySnapshot>(
-             future: events.where('subtype',isEqualTo: widget.subtype).get().then((querySnapshot) {
+             future: events.where('subtype',isEqualTo: widget.subtype).orderBy('name').get().then((querySnapshot) {
                querySnapshot.docs.forEach((result) {
 
                }

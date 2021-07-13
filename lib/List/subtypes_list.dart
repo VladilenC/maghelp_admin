@@ -27,7 +27,7 @@ class _ListSubtypes extends State<ListSubtypes> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<QuerySnapshot>(
-             future: subtypes.where('typeid',isEqualTo: widget.type).get().then((querySnapshot) {
+             future: subtypes.where('typeid',isEqualTo: widget.type).orderBy('name').get().then((querySnapshot) {
                querySnapshot.docs.forEach((result) {
 
 

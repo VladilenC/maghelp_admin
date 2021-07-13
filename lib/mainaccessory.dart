@@ -5,13 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase/firebase.dart' as Firebase;
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_web/image_picker_web.dart';
-import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'dart:async';
 import 'dart:io';
-import 'List/images_list3.dart';
 import 'package:mime_type/mime_type.dart';
+import 'List/accessory_list.dart';
 import 'package:path/path.dart' as Path;
 
 
@@ -66,12 +64,17 @@ class _MyPic3State extends State<MyPic3> {
           /// TODO: cache images correctly
           ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
           _web2 == null
-              ? Text('Картинка не выбрана.')
+              ? Text('Картинка не выбрана.',textAlign: TextAlign.center)
               : _web2,
 
 
-          !isLoading
-              ? ElevatedButton(
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              !isLoading ?
+              ElevatedButton(
                   child: Text("Сохранить"),
               style: ElevatedButton.styleFrom(
                 primary: Colors.teal,
@@ -133,10 +136,10 @@ class _MyPic3State extends State<MyPic3> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ListImages3(title: "Список аксессуаров", id: null)),
+                      builder: (context) => ListAccessories(title: "Список аксессуаров")),
                 );
               }
-              ),
+              ),])
 
         ]),
       ),
@@ -154,7 +157,7 @@ class _MyPic3State extends State<MyPic3> {
     setState(() {
       _media = mediaInfo;
       _uiWeb = mediaInfo.data;
- //     _web = image;
+      //     _web = image;
       _web2 = Image.memory(mediaInfo.data);
     });
   }
@@ -169,10 +172,6 @@ class _MyPic3State extends State<MyPic3> {
         shrinkWrap: true,
         itemCount: cachedResult.docs.length,
         itemBuilder: (BuildContext context, int index) {
-          print(cachedResult.docs[index]["url"]);
-          print('111');
-          print(isRetrieved);
-          print(cachedResult.docs.length);
           return ListTile(
             contentPadding: EdgeInsets.all(8.0),
             title: Text(cachedResult.docs[index]["name"]),

@@ -63,12 +63,10 @@ class _ListAccessories extends State<ListAccessories> {
 
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasData) {
-                //          acts.doc().set({'name': '2'});
                 lists.clear();
                 listId.clear();
                 final List<DocumentSnapshot> values = snapshot.data.docs;
                 values.asMap().forEach((key, values) {
-                  //         acts.doc().update({'name': '3'});
                   lists.add(values.data());
                   listId.add(values.id);
                 });
@@ -76,18 +74,15 @@ class _ListAccessories extends State<ListAccessories> {
                     shrinkWrap: true,
                     itemCount: lists.length,
                     itemBuilder: (BuildContext context,  index) {
-                      snapshot.data.docs[index];
+         //             snapshot.data.docs[index];
                       return ListTile(
                         contentPadding: EdgeInsets.all(8.0),
                         title: Text("Название: " + lists[index]["name"]),
                         leading: snapshot.data.docs[index]["url"] != null ? Image.network(snapshot.data.docs[index]["url"]):null,
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
+                        trailing: IconButton( icon: Icon(Icons.delete),
+
                           onPressed: () async {
                             var _per = snapshot.data.docs[index].id;
-                            print('0000000000000');
-                            print(_per);
-                            print('1111111111');
                             var ev = await acts.doc(widget.id).collection('accessory').doc(_per).delete().then((_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Удалено')));
@@ -99,7 +94,11 @@ class _ListAccessories extends State<ListAccessories> {
 
                             });
                           },
+
                         ),
+                        onTap: () {
+
+                        },
                       );
 
 

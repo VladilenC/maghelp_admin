@@ -6,7 +6,7 @@ import 'package:maghelp_add_act/mainact.dart';
 import 'package:maghelp_add_act/mainimage.dart';
 import 'package:maghelp_add_act/mainimageweb.dart';
 import 'package:maghelp_add_act/mainimageweb2.dart';
-import 'package:maghelp_add_act/mainimageweb3.dart';
+import 'package:maghelp_add_act/mainaccessory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:maghelp_add_act/maintype.dart';

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:maghelp_add_act/Edit/act_edit.dart';
-import 'package:maghelp_add_act/List/accessories_list.dart';
+import 'package:maghelp_add_act/List/accessories_act_list.dart';
 
 class ListActs extends StatefulWidget {
   ListActs({Key key,  this.title, this.event}) : super(key: key);

@@ -53,7 +53,7 @@ class _SecondPageState extends State<SecondPage> {
           /// TODO: cache images correctly
           ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
           _image == null
-              ? Text('Картинка не выбрана.')
+              ? Text('Картинка не выбрана.',textAlign: TextAlign.center)
               : Image.file(
                   _image,
                   height: 300,

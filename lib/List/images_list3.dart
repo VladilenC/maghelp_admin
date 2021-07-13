@@ -8,10 +8,10 @@ class ListImages3 extends StatefulWidget {
   final dynamic id;
 
   @override
-  _ListImages2 createState() => _ListImages2();
+  _ListImages3 createState() => _ListImages3();
 }
 
-class _ListImages2 extends State<ListImages3> {
+class _ListImages3 extends State<ListImages3> {
   final acts = FirebaseFirestore.instance.collection("acts");
   final FirebaseFirestore fb = FirebaseFirestore.instance;
   QuerySnapshot cachedResult;
@@ -83,9 +83,6 @@ print(snapshot.data.docs.length);
 
 putImage(ind)  {
     if (widget.id!=null) {
-
-    print('4444: '+ind.toString());
-    print(acts.doc(widget.id));
     var ev =  acts.doc(widget.id).collection('accessory').add({"url": cachedResult.docs[ind]["url"], "name": cachedResult.docs[ind]["name"]}).then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Сохранено')));
@@ -105,10 +102,11 @@ putImage(ind)  {
         shrinkWrap: true,
         itemCount: cachedResult.docs.length,
         itemBuilder: (BuildContext context, int index) {
-          print(cachedResult.docs[index]["url"]);
-          print('111');
            return ListTile(
             contentPadding: EdgeInsets.all(8.0),
+            onTap: () {
+
+            },
             title: Text(cachedResult.docs[index]["name"]),
             leading: Image.network(cachedResult.docs[index]["url"],
                 fit: BoxFit.fill),

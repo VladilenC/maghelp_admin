@@ -241,7 +241,7 @@ TextFormField(
 
               Padding(
                padding: EdgeInsets.all(5.0),
-                child: _url!=null ? Image.network(_url) : url != null ? Image.network(url):Text('Нет картинки')),
+                child: _url!=null ? Image.network(_url) : url != null ? Image.network(url):Text('Нет картинки',textAlign: TextAlign.center)),
 
               Padding(
                 padding: EdgeInsets.all(5.0),
