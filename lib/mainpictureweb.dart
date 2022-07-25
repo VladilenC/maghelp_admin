@@ -3,27 +3,27 @@ import 'package:firebase/firebase.dart' as Firebase;
 import 'package:flutter/material.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:async';
+import 'List/pictures_list.dart';
 import 'package:mime_type/mime_type.dart';
-import 'List/accessory_list.dart';
 import 'package:path/path.dart' as Path;
 
-class MyPic3 extends StatefulWidget {
-  MyPic3({Key? key, this.accessories}) : super(key: key);
-  final accessories;
+class MyPic2 extends StatefulWidget {
+  MyPic2({Key? key}) : super(key: key);
 
   @override
-  _MyPic3State createState() => _MyPic3State();
+  _MyPic2State createState() => _MyPic2State();
 }
 
-class _MyPic3State extends State<MyPic3> {
+class _MyPic2State extends State<MyPic2> {
   final _formKey = GlobalKey<FormState>();
   var _web2;
   var _uiWeb;
   var _media;
   bool isLoading = false;
   final nameController = TextEditingController();
-  CollectionReference accessories =
-      FirebaseFirestore.instance.collection("accessories");
+  CollectionReference pictures =
+      FirebaseFirestore.instance.collection("pictures");
+  final ref = Firebase.storage().ref();
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _MyPic3State extends State<MyPic3> {
                 controller: nameController,
                 maxLines: 1,
                 decoration: InputDecoration(
-                    labelText: 'Введите название аксессуара',
+                    labelText: 'Введите название',
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0))),
               ),
@@ -51,9 +51,7 @@ class _MyPic3State extends State<MyPic3> {
               _web2 == null
                   ? Text('Картинка не выбрана.', textAlign: TextAlign.center)
                   : _web2,
-              SizedBox(
-                height: 5.0,
-              ),
+              SizedBox(height: 5),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 ElevatedButton(
                     child: Text("Выбор картинки"),
@@ -63,9 +61,8 @@ class _MyPic3State extends State<MyPic3> {
                       shadowColor: Colors.grey,
                       elevation: 5,
                     ),
-                    onPressed: getImage)
+                    onPressed: getImage),
               ]),
-              SizedBox(height: 5),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 !isLoading
                     ? ElevatedButton(
@@ -78,30 +75,34 @@ class _MyPic3State extends State<MyPic3> {
                         ),
                         onPressed: () async {
                           if (_web2 != null) {
-                            var mimeType =
-                                mime(Path.basename(_media.fileName.toString()));
-                            final extension =
-                                extensionFromMime(mimeType.toString());
+                            var mimeType = mime(Path.basename(_media.fileName));
+                            final extension = extensionFromMime(mimeType!);
                             Firebase.StorageReference storageReference =
-                                Firebase.storage().ref().child("accessory/" +
+                                ref.child("picture/" +
                                     nameController.text +
                                     ".$extension");
+
                             var metadata = Firebase.UploadMetadata(
                               contentType: mimeType,
                             );
+
                             var addImg = await storageReference
                                 .put(_uiWeb, metadata)
                                 .future;
+
                             setState(() {
                               this.isLoading = true;
                             });
+
                             if (addImg.state == Firebase.TaskState.SUCCESS) {
                               final downloadUrl =
                                   await storageReference.getDownloadURL();
+
                               setState(() {
                                 this.isLoading = false;
                               });
-                              await accessories.add({
+
+                              await pictures.add({
                                 'url': downloadUrl.toString(),
                                 'name': nameController.text
                               });
@@ -129,7 +130,7 @@ class _MyPic3State extends State<MyPic3> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                ListAccessories(title: "Список аксессуаров", accessories: widget.accessories)),
+                                ListPicture(title: "Список картинок", id: 1)),
                       );
                     }),
               ]),
@@ -146,11 +147,38 @@ class _MyPic3State extends State<MyPic3> {
   }
 
   Future getImage() async {
-    var mediaInfo = await ImagePickerWeb.getImageInfo;
+    MediaInfo? mediaInfo = await ImagePickerWeb.getImageInfo;
+
     setState(() {
       _media = mediaInfo;
       _uiWeb = mediaInfo?.data;
+      //     _web = image;
       _web2 = Image.memory(mediaInfo!.data!);
     });
   }
+/*
+  Future<QuerySnapshot> getImages() {
+    print('333');
+    return fb.collection("pictures").get();
+  }
+
+  ListView displayCachedList() {
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: cachedResult.docs.length,
+        itemBuilder: (BuildContext context, int index) {
+          print(cachedResult.docs[index]["url"]);
+          print('111');
+          print(isRetrieved);
+          print(cachedResult.docs.length);
+          return ListTile(
+            contentPadding: EdgeInsets.all(8.0),
+            title: Text(cachedResult.docs[index]["name"]),
+            leading: Image.network(cachedResult.docs[index]["url"],
+                fit: BoxFit.fill),
+          );
+        });
+  }
+
+ */
 }

@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '/Edit/accessory_edit.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '/Utils/helpers.dart';
 
-class ListAccessories extends StatefulWidget {
-  ListAccessories({Key? key, this.title, this.accessories}) : super(key: key);
-  final dynamic title, accessories;
+class ListAccessoriesAdd extends StatefulWidget {
+  ListAccessoriesAdd({Key? key, this.title, this.id, this.accessories})
+      : super(key: key);
+  final dynamic title;
+  final id, accessories;
 
   @override
-  _ListAccessories createState() => _ListAccessories();
+  _ListAccessoriesAdd createState() => _ListAccessoriesAdd();
 }
 
-class _ListAccessories extends State<ListAccessories> {
+class _ListAccessoriesAdd extends State<ListAccessoriesAdd> {
+  final acts = FirebaseFirestore.instance.collection("acts");
   /*
   final Stream<QuerySnapshot> accessories = FirebaseFirestore.instance
       .collection("accessories")
@@ -21,8 +24,9 @@ class _ListAccessories extends State<ListAccessories> {
       */
   var lists = [];
   List<String> listId = [];
+  int _selectedIndex = -1;
   String textSearch = '';
-  var searchBar;
+  var searchBar, xxx;
 
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
@@ -30,8 +34,8 @@ class _ListAccessories extends State<ListAccessories> {
         actions: [searchBar.getSearchAction(context)]);
   }
 
-  _ListAccessories() {
-    searchBar = SearchBar(
+  _ListAccessoriesAdd() {
+    searchBar = new SearchBar(
         inBar: false,
         setState: setState,
         onSubmitted: (text) {
@@ -55,12 +59,12 @@ class _ListAccessories extends State<ListAccessories> {
                 listId.clear();
                 final List<DocumentSnapshot> values = snapshot.data!.docs;
                 if (textSearch == '') {
-                  values.asMap().forEach((key, values) {
+                  values.asMap().forEach((key, values) async {
                     lists.add(values.data());
                     listId.add(values.id);
                   });
                 } else {
-                  values.asMap().forEach((key, values) {
+                  values.asMap().forEach((key, values) async {
                     if (values['name']
                         .toString()
                         .toLowerCase()
@@ -83,28 +87,44 @@ class _ListAccessories extends State<ListAccessories> {
                                 imageUrl: lists[index]["url"],
                                 placeholder: (context, url) =>
                                     CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
+                                errorWidget: (context, url, error) {
+                                  return Icon(Icons.error);
+                                }
                               )
-                            //                      Image.network(lists[index]["url"])
+                            //                  Image.network(lists[index]["url"])
                             : null,
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AccessoryEdit1(
-                                    nom: index.toString(),
-                                    url: lists[index]["url"],
-                                    id: listId[index],
-                                    name: lists[index]["name"],
-                                    title: "Редактирование")),
-                          );
-                          setState(() {});
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                            putImage(index);
+                          });
                         },
+                        selected: index == _selectedIndex,
+                        selectedTileColor: Colors.lightBlueAccent,
                       );
                     });
               }
               return CircularProgressIndicator();
             }));
+  }
+
+  putImage(ind) {
+    if (widget.id != null) {
+      acts.doc(widget.id).collection('accessory').add({
+        "url": lists[ind]["url"],
+        "name": lists[ind]["name"],
+        "accId": listId[ind]
+      }).then((_) async {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Сохранено')));
+        dynamic _count = await accessoryValue(widget.id);
+        await acts.doc(widget.id).update({'accessories': _count});
+      }).catchError((onError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(onError)));
+      });
+    }
+    Navigator.pop(
+        context, {"url": lists[ind]["url"], "name": lists[ind]["name"]});
   }
 }

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:maghelp_add_act/Edit/event_edit.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ListImages3 extends StatefulWidget {
-  ListImages3({Key key, this.title, this.id}) : super(key: key);
+  ListImages3({Key? key, this.title, this.id}) : super(key: key);
   final dynamic title;
   final dynamic id;
 
@@ -13,12 +13,13 @@ class ListImages3 extends StatefulWidget {
 
 class _ListImages3 extends State<ListImages3> {
   final acts = FirebaseFirestore.instance.collection("acts");
-  final FirebaseFirestore fb = FirebaseFirestore.instance;
-  QuerySnapshot cachedResult;
+  final Stream<QuerySnapshot> accessories = FirebaseFirestore.instance
+      .collection("accessories")
+      .orderBy('name')
+      .snapshots();
+  var cachedResult;
   bool isRetrieved = false;
-  List<Map<dynamic, dynamic>> lists = [];
-  List<String> listId = [];
-  int _selectedIndex=-1;
+  int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -27,90 +28,79 @@ class _ListImages3 extends State<ListImages3> {
           title: Text(widget.title),
         ),
         body:
+/*
         FutureBuilder(
-        future: getImages(),
-    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    if (snapshot.connectionState == ConnectionState.done) {
-    isRetrieved = true;
-    cachedResult = snapshot.data;
-print(snapshot.data.docs.length);
-
-    return
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: snapshot.data.docs.length,
-          itemBuilder: (BuildContext context, int index) {
-          return
-               ListTile(
-                onTap: () {
-                   print(index);
-                   setState(() {
-                     print(index);
-              // устанавливаем индекс выделенного элемента
-                     _selectedIndex = index;
-          if (widget.id!=null) {
-                      putImage(index);
-          }
-
-     //     return index;
-                   });
-                },
-                selected: index == _selectedIndex,
-                selectedTileColor: Colors.lightBlueAccent,
-                contentPadding: EdgeInsets.all(8.0),
-                title: Text(snapshot.data.docs[index]["name"], style: TextStyle(color: Colors.black),),
-                leading: Image.network(snapshot.data.docs[index]["url"],
-                fit: BoxFit.fill),
-              );
-        });
-
-
-    } else if (snapshot.connectionState ==
-    ConnectionState.none) {
-    return Text("Нет данных");
-    }
-    return CircularProgressIndicator();
-    },
-    )
-
-          );
+          future: getImages(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              isRetrieved = true;
+              cachedResult = snapshot.data;
+*/
+            StreamBuilder<dynamic>(
+          stream: accessories,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              isRetrieved = true;
+              cachedResult = snapshot.data;
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                            if (widget.id != null) {
+                              putImage(index);
+                            }
+                          });
+                        },
+                        selected: index == _selectedIndex,
+                        selectedTileColor: Colors.lightBlueAccent,
+                        contentPadding: EdgeInsets.all(8.0),
+                        title: Text(
+                          snapshot.data!.docs[index]["name"],
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        leading: CachedNetworkImage(
+                          imageUrl: snapshot.data!.docs[index]["url"],
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        )
+                        //                 Image.network(snapshot.data!.docs[index]["url"], fit: BoxFit.fill),
+                        );
+                  });
+            } else if (snapshot.connectionState == ConnectionState.none) {
+              return Text("Нет данных");
+            }
+            return CircularProgressIndicator();
+          },
+        ));
   }
 
+/*
   Future<QuerySnapshot> getImages() {
-
     return fb.collection("accessories").get();
   }
-
-putImage(ind)  {
-    if (widget.id!=null) {
-    var ev =  acts.doc(widget.id).collection('accessory').add({"url": cachedResult.docs[ind]["url"], "name": cachedResult.docs[ind]["name"]}).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Сохранено')));
-    }).catchError((onError) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(onError)));
-    });}
-    Navigator.pop(
-        context, {"url": cachedResult.docs[ind]["url"], "name": cachedResult.docs[ind]["name"]}
-    );
-  }
-
-  ListView displayCachedList() {
-    isRetrieved = true;
-
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: cachedResult.docs.length,
-        itemBuilder: (BuildContext context, int index) {
-           return ListTile(
-            contentPadding: EdgeInsets.all(8.0),
-            onTap: () {
-
-            },
-            title: Text(cachedResult.docs[index]["name"]),
-            leading: Image.network(cachedResult.docs[index]["url"],
-                fit: BoxFit.fill),
-          );
-        });
+*/
+  putImage(ind) {
+    if (widget.id != null) {
+      acts.doc(widget.id).collection('accessory').add({
+        "url": cachedResult.docs[ind]["url"],
+        "name": cachedResult.docs[ind]["name"]
+      }).then((_) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Сохранено')));
+      }).catchError((onError) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(onError)));
+      });
+    }
+    Navigator.pop(context, {
+      "url": cachedResult.docs[ind]["url"],
+      "name": cachedResult.docs[ind]["name"]
+    });
   }
 }

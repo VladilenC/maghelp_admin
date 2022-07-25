@@ -1,19 +1,12 @@
-
 import 'package:firebase_core/firebase_core.dart';
-import 'package:maghelp_add_act/mainsubtype.dart';
-import 'package:maghelp_add_act/mainevent.dart';
-import 'package:maghelp_add_act/mainact.dart';
-import 'package:maghelp_add_act/mainimage.dart';
-import 'package:maghelp_add_act/mainimageweb.dart';
-import 'package:maghelp_add_act/mainimageweb2.dart';
-import 'package:maghelp_add_act/mainaccessory.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:maghelp_add_act/maintype.dart';
+//import 'package:flutter/widgets.dart';
+import 'Widgets/auth_dialog.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+//import 'package:flutter/services.dart';
+import 'firebase_options.dart';
 
-
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(App());
 }
@@ -26,17 +19,19 @@ class _AppState extends State<App> {
   // Set default `_initialized` and `_error` state to false
   bool _initialized = false;
   bool _error = false;
-  int ww1;
 
   // Define an async function to initialize FlutterFire
   void initializeFlutterFire() async {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
-      await Firebase.initializeApp();
+   //   await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       setState(() {
         _initialized = true;
       });
-    } catch(e) {
+    } catch (e) {
       // Set `_error` state to true if Firebase initialization fails
       setState(() {
         _error = true;
@@ -53,61 +48,45 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     // Show error message if initialization failed
-    if(_error) {
+
+    if (_error) {
       return Text('Error');
     }
 
+
     // Show a loader until FlutterFire is initialized
     if (!_initialized) {
-      return
-        SizedBox(
-            height: 36,
-            width: 16,
-            child: Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                )
-            )
-        );
+      return SizedBox(
+          height: 36,
+          width: 16,
+          child: Center(
+              child: CircularProgressIndicator(
+            strokeWidth: 1.5,
+          )));
     }
 
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'События',
+        title: 'Maghelp',
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          // 'en' is the language code. We could optionally provide a
+          // a country code as the second param, e.g.
+          // Locale('en', 'US'). If we do that, we may want to
+          // provide an additional app_en_US.arb file for
+          // region-specific translations.
+          //  const Locale('en', ''),
+          const Locale('ru', 'RU'),
+        ],
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: DefaultTabController(
-          length: 7,
-          child: Scaffold(
-            appBar: AppBar(title: Text('Магическая помощь'),
-              centerTitle: true,
-              bottom: TabBar(
-                tabs: [
-                  Tab(text: 'Типы'),
-                  Tab(text: 'Подтипы'),
-                  Tab(text: 'События'),
-                  Tab(text: 'Действия'),
-                  Tab(text: 'Картинки'),
-                  Tab(text: 'Картинки в тексте'),
-                  Tab(text: 'Аксессуары')
-                  //   Tab(text: 'Типы')
-                ],
-              ),),
-            body: TabBarView(
-              children: [
-                MyType(),
-                MySubType(),
-                MyEvent(),
-                MyAct(),
-                MyPic(),
-                MyPic2(),
-                MyPic3()
-              ],
-            ),
-          ),
-        )
-    );
+        home: AuthDialog());
 
+    //App_Menu());
   }
 }

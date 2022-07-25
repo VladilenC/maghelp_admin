@@ -1,19 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:maghelp_add_act/Edit/image_edit.dart';
+import '/Edit/picture_edit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class ListImages extends StatefulWidget {
-  ListImages({Key? key, this.title, this.id}) : super(key: key);
+class ListPicture extends StatefulWidget {
+  ListPicture({Key? key, this.title, this.id}) : super(key: key);
   final dynamic title;
   final dynamic id;
 
   @override
-  _ListImages createState() => _ListImages();
+  _ListPicture createState() => _ListPicture();
 }
 
-class _ListImages extends State<ListImages> {
-  final Stream<QuerySnapshot> images = FirebaseFirestore.instance.collection("images").orderBy('name').snapshots();
+class _ListPicture extends State<ListPicture> {
+  final Stream<QuerySnapshot> pictures = FirebaseFirestore.instance
+      .collection("pictures")
+      .orderBy('name')
+      .snapshots();
   var cachedResult;
   bool isRetrieved = false;
   int _selectedIndex = -1;
@@ -24,24 +27,12 @@ class _ListImages extends State<ListImages> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body:
-      /*
-        FutureBuilder(
-          future: getImages(),
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              isRetrieved = true;
-              cachedResult = snapshot.data;
-    */
-        StreamBuilder<dynamic> (
-          stream: images,
+        body: StreamBuilder<dynamic>(
+          stream: pictures,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               isRetrieved = true;
               cachedResult = snapshot.data;
-              print(snapshot.data!.docs.length);
-
-
               return ListView.builder(
                   shrinkWrap: true,
                   itemCount: snapshot.data!.docs.length,
@@ -67,7 +58,7 @@ class _ListImages extends State<ListImages> {
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),
                         )
-             //                           Image.network(snapshot.data!.docs[index]["url"], fit: BoxFit.fill),
+                        //              Image.network(snapshot.data!.docs[index]["url"], fit: BoxFit.fill),
                         );
                   });
             } else if (snapshot.connectionState == ConnectionState.none) {
@@ -77,9 +68,10 @@ class _ListImages extends State<ListImages> {
           },
         ));
   }
+
 /*
-  Future<QuerySnapshot> getImages() {
-    return fb.collection("images").get();
+  Stream getImages() {
+    return fb.collection("pictures").snapshots();
   }
 */
   putImage(ind) async {
@@ -87,7 +79,7 @@ class _ListImages extends State<ListImages> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ImageEdit1(
+            builder: (context) => PictureEdit(
                 nom: ind.toString(),
                 url: cachedResult.docs[ind]["url"],
                 id: cachedResult.docs[ind].id,

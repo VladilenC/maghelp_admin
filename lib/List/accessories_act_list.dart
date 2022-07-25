@@ -1,172 +1,121 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:maghelp_add_act/List/images_list3.dart';
+import 'accessory_list_add.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '/Utils/helpers.dart';
 
-class ListAccessories extends StatefulWidget {
-  ListAccessories({Key key, this.title,this.id, this.name}) : super(key: key);
+class ListAccessoriesAct extends StatefulWidget {
+  ListAccessoriesAct(
+      {Key? key, this.title, this.id, this.name, this.accessories})
+      : super(key: key);
   final dynamic title;
   final dynamic id;
-  final dynamic name;
+  final dynamic name, accessories;
 
   @override
-  _ListAccessories createState() => _ListAccessories();
+  _ListAccessoriesAct createState() => _ListAccessoriesAct();
 }
 
-class _ListAccessories extends State<ListAccessories> {
+class _ListAccessoriesAct extends State<ListAccessoriesAct> {
   final acts = FirebaseFirestore.instance.collection("acts");
-  final FirebaseFirestore fb = FirebaseFirestore.instance;
-  QuerySnapshot cachedResult;
+  /*
+  final Stream<QuerySnapshot> accessories = FirebaseFirestore.instance
+      .collection("accessories")
+      .orderBy('name')
+      .snapshots();
+ */
   bool isRetrieved = false;
-  List<Map<dynamic, dynamic>> lists = [];
+  var lists = [];
   List<String> listId = [];
-  int _selectedIndex=-1;
-
+/*
+  getAccessories(id) async {
+    return await acts.doc(id).collection('accessories').doc().get();
+  }
+*/
   @override
   Widget build(BuildContext context) {
+    //  print('000000');
+    //  print(getAccessories(widget.id));
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title+':  '+widget.name),
+          title: Text(widget.title + ':  ' + widget.name),
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          child: Icon(Icons.add),
-          onPressed: () async {
-
-
-           var _ac = await Navigator.push(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            child: Icon(Icons.add),
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ListImages3(title: "Список аксессуаров", id: widget.id)),
+                    builder: (context) => ListAccessoriesAdd(
+                        title: "Список аксессуаров",
+                        id: widget.id,
+                        accessories: widget.accessories)),
               );
-      setState(() {
-
-      });
-
-
-    }
-
-        ),
-        body: FutureBuilder<QuerySnapshot>(
-            future: acts.doc(widget.id).collection('accessory').get().then((querySnapshot) {
-              querySnapshot.docs.forEach((result) {
-                //                 var i1 = result.id;
-                //                acts.doc(i1).update({'name': '1','url': '', 'description2': '', 'url2': '', 'description3': '', 'url3': ''});
-
-//                  acts.doc(i1).collection('accessory').add({'name': '1','url': ''});
-              }
-              );
-
-              return querySnapshot;
+              setState(() {});
             }),
-
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        body: StreamBuilder<QuerySnapshot>(
+            stream: acts.doc(widget.id).collection('accessory').snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasData) {
                 lists.clear();
                 listId.clear();
-                final List<DocumentSnapshot> values = snapshot.data.docs;
+                final List<DocumentSnapshot> values = snapshot.data!.docs;
                 values.asMap().forEach((key, values) {
                   lists.add(values.data());
                   listId.add(values.id);
                 });
+
                 return new ListView.builder(
                     shrinkWrap: true,
                     itemCount: lists.length,
-                    itemBuilder: (BuildContext context,  index) {
-         //             snapshot.data.docs[index];
+                    itemBuilder: (BuildContext context, index) {
                       return ListTile(
                         contentPadding: EdgeInsets.all(8.0),
-                        title: Text("Название: " + lists[index]["name"]),
-                        leading: snapshot.data.docs[index]["url"] != null ? Image.network(snapshot.data.docs[index]["url"]):null,
-                        trailing: IconButton( icon: Icon(Icons.delete),
-
+                        title: Text(lists[index]["name"] +
+                            '-----' +
+                            lists[index]["accId"]),
+                        leading: lists[index]["url"] != null
+                            ? CachedNetworkImage(
+                                imageUrl: lists[index]["url"],
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) {
+                                  return Icon(Icons.error);
+                                },
+                              )
+                            //                  Image.network(lists[index]["url"])
+                            : null,
+                        trailing: IconButton(
+                          icon: Icon(Icons.delete),
                           onPressed: () async {
-                            var _per = snapshot.data.docs[index].id;
-                            var ev = await acts.doc(widget.id).collection('accessory').doc(_per).delete().then((_) {
+                            var _per = listId[index];
+                            await acts
+                                .doc(widget.id)
+                                .collection('accessory')
+                                .doc(_per)
+                                .delete()
+                                .then((_) async {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Удалено')));
+                              dynamic _count = await accessoryValue(widget.id);
+                              await acts
+                                  .doc(widget.id)
+                                  .update({'accessories': _count});
                             }).catchError((onError) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(content: Text(onError)));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(onError)));
                             });
-                            setState(() {
-
-                            });
+                            setState(() {});
                           },
-
                         ),
-                        onTap: () {
-
-                        },
+                        onTap: () {},
                       );
-
-
-
-
-
-                        Card(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            snapshot.data.docs[index]["url"] != null ? Image.network(snapshot.data.docs[index]["url"]):null,
-                            Text("Название: " + lists[index]["name"]),
-                          ],
-                        ),
-                      );
-
-
                     });
               }
               return CircularProgressIndicator();
-            }
-        )
-
-          );
-  }
-
-  Future<QuerySnapshot> getImages() {
-
-    return acts.doc().collection("accessories").get();
-  }
-
-putImage(ind)  {
-    if (widget.id!=null) {
-
-    print('4444: '+ind.toString());
-    print(acts.doc(widget.id));
-    var ev =  acts.doc(widget.id).collection('accessory').doc().update({"url": cachedResult.docs[ind]["url"], "name": cachedResult.docs[ind]["name"]}).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Сохранено')));
-    }).catchError((onError) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(onError)));
-    });
-
-    print('99999999999');
-    print(acts.doc(widget.id).collection('accessory').doc());
-
-    }
- Navigator.pop(
-        context, {"url": cachedResult.docs[ind]["url"], "name": cachedResult.docs[ind]["name"]}
-    );
-  }
-
-  ListView displayCachedList() {
-    isRetrieved = true;
-
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: cachedResult.docs.length,
-        itemBuilder: (BuildContext context, int index) {
-          print(cachedResult.docs[index]["url"]);
-          print('111');
-           return ListTile(
-            contentPadding: EdgeInsets.all(8.0),
-            title: Text(cachedResult.docs[index]["name"]),
-            leading: Image.network(cachedResult.docs[index]["url"],
-                fit: BoxFit.fill),
-          );
-        });
+            }));
   }
 }

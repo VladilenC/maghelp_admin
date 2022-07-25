@@ -7,20 +7,19 @@ import 'package:image_picker/image_picker.dart';
 import 'List/images_list.dart';
 
 class SecondPage extends StatefulWidget {
-  SecondPage({Key key}) : super(key: key);
+  SecondPage({Key? key}) : super(key: key);
 
   @override
   _SecondPageState createState() => _SecondPageState();
 }
 
 class _SecondPageState extends State<SecondPage> {
-  final FirebaseFirestore fb = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
-  File _image;
+  var _image;
   bool isLoading = false;
-  bool isRetrieved = false;
-  QuerySnapshot cachedResult;
   final nameController = TextEditingController();
+  CollectionReference images = FirebaseFirestore.instance.collection("images");
+  Reference ref = FirebaseStorage.instance.ref();
 
   @override
   void initState() {
@@ -30,91 +29,87 @@ class _SecondPageState extends State<SecondPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Form(
         key: _formKey,
         child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             children: <Widget>[
-
-          SizedBox(height: 10.0),
-
-          TextField(
-            controller: nameController,
-            maxLines: 1,
-            decoration: InputDecoration(
-                labelText: 'Введите название',
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0)
-                )
-            ),
-          ),
-          SizedBox(height: 5.0),
-          /// TODO: cache images correctly
-          ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
-          _image == null
-              ? Text('Картинка не выбрана.',textAlign: TextAlign.center)
-              : Image.file(
-                  _image,
-                  height: 300,
-                ),
-          !isLoading
-              ? ElevatedButton(
-                  child: Text("Сохранить"),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.teal,
-                onPrimary: Colors.white,
-                shadowColor: Colors.grey,
-                elevation: 5,
+              SizedBox(height: 10.0),
+              TextField(
+                controller: nameController,
+                maxLines: 1,
+                decoration: InputDecoration(
+                    labelText: 'Введите название',
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0))),
               ),
-                  onPressed: () async {
-                    if (_image != null) {
-                      setState(() {
-                        this.isLoading = true;
-                      });
-                      Reference ref = FirebaseStorage.instance.ref();
-                      TaskSnapshot addImg =
-                          await ref.child("image/"+nameController.text).putFile(_image);
-                      if (addImg.state == TaskState.success) {
-                        setState(() {
-                          this.isLoading = false;
-                        });
-                        final String downloadUrl = await addImg.ref.getDownloadURL();
+              SizedBox(height: 5.0),
+              ElevatedButton(child: Text("Загрузить"), onPressed: getImage),
+              _image == null
+                  ? Text('Картинка не выбрана.', textAlign: TextAlign.center)
+                  : Image.file(
+                      _image,
+                      height: 300,
+                    ),
+              !isLoading
+                  ? ElevatedButton(
+                      child: Text("Сохранить"),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.teal,
+                        onPrimary: Colors.white,
+                        shadowColor: Colors.grey,
+                        elevation: 5,
+                      ),
+                      onPressed: () async {
+                        if (_image != null) {
+                          setState(() {
+                            this.isLoading = true;
+                          });
+                          TaskSnapshot addImg = await ref
+                              .child("image/" + nameController.text)
+                              .putFile(_image);
+                          if (addImg.state == TaskState.success) {
+                            setState(() {
+                              this.isLoading = false;
+                            });
+                            final String downloadUrl =
+                                await addImg.ref.getDownloadURL();
 
-                        await FirebaseFirestore.instance
-                            .collection('images')
-                            .add({'url': downloadUrl, 'name': nameController.text});
-                        setState(() {
-                          this.isLoading = false;
-                        });
-                        print("Добавлено");
-                        nameController.clear();
-                        _image=null;
-                      }
-                    }
-                  })
-              : CircularProgressIndicator(),
-
+                            await images.add({
+                              'url': downloadUrl,
+                              'name': nameController.text
+                            });
+                            setState(() {
+                              this.isLoading = false;
+                            });
+                            print("Добавлено");
+                            nameController.clear();
+                            _image = null;
+                          }
+                        }
+                      })
+                  : CircularProgressIndicator(),
               ElevatedButton(
-              child: Text("Список"),
+                  child: Text("Список"),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.amber,
                     onPrimary: Colors.white,
                     shadowColor: Colors.grey,
                     elevation: 5,
                   ),
-              onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ListImages(title: "Список картинок", id: null)),
-                );
-              }),
-
-        ]),
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ListImages(title: "Список картинок", id: null)),
+                    );
+                  }),
+            ]),
       ),
     );
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -123,33 +118,10 @@ class _SecondPageState extends State<SecondPage> {
 
   Future getImage() async {
     final _picker = ImagePicker();
-    var image = await _picker.getImage(source: ImageSource.gallery);
+    var image = await _picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
-      _image = File(image.path);
+      _image = File(image!.path);
     });
-  }
-
-  Future<QuerySnapshot> getImages() {
-    print('333');
-    return fb.collection("images").get();
-  }
-
-  ListView displayCachedList() {
-    return ListView.builder(
-        shrinkWrap: true,
-        itemCount: cachedResult.docs.length,
-        itemBuilder: (BuildContext context, int index) {
-          print(cachedResult.docs[index]["url"]);
-          print('111');
-          print(isRetrieved);
-          print(cachedResult.docs.length);
-          return ListTile(
-            contentPadding: EdgeInsets.all(8.0),
-            title: Text(cachedResult.docs[index]["name"]),
-            leading: Image.network(cachedResult.docs[index]["url"],
-                fit: BoxFit.fill),
-          );
-        });
   }
 }

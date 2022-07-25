@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class AccessoryEdit1 extends StatefulWidget {
-  AccessoryEdit1({Key? key, this.nom, this.id, this.name, this.title, this.url})
+class ImageEdit1 extends StatefulWidget {
+  ImageEdit1({Key? key, this.nom, this.id, this.name, this.title, this.url})
       : super(key: key);
   final dynamic title;
   final dynamic nom;
@@ -12,10 +12,10 @@ class AccessoryEdit1 extends StatefulWidget {
   final dynamic url;
 
   @override
-  _AccessoryEdit1 createState() => _AccessoryEdit1();
+  _ImageEdit1 createState() => _ImageEdit1();
 }
 
-class _AccessoryEdit1 extends State<AccessoryEdit1> {
+class _ImageEdit1 extends State<ImageEdit1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,13 +27,13 @@ class _AccessoryEdit1 extends State<AccessoryEdit1> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("Измените аксессуар",
+              Text("Измените картинку",
                   style: TextStyle(
                       fontWeight: FontWeight.w200,
                       fontSize: 30,
                       fontFamily: 'Roboto',
                       fontStyle: FontStyle.italic)),
-              AccessoryEdit(
+              ImageEdit(
                   nom: widget.nom,
                   url: widget.url,
                   id: widget.id,
@@ -44,8 +44,8 @@ class _AccessoryEdit1 extends State<AccessoryEdit1> {
   }
 }
 
-class AccessoryEdit extends StatefulWidget {
-  AccessoryEdit({Key? key, this.nom, this.id, this.name, this.url})
+class ImageEdit extends StatefulWidget {
+  ImageEdit({Key? key, this.nom, this.id, this.name, this.url})
       : super(key: key);
   final dynamic nom;
   final dynamic id;
@@ -53,20 +53,18 @@ class AccessoryEdit extends StatefulWidget {
   final dynamic url;
 
   @override
-  _AccessoryEditState createState() => _AccessoryEditState();
+  _ImageEditState createState() => _ImageEditState();
 }
 
-class _AccessoryEditState extends State<AccessoryEdit> {
+class _ImageEditState extends State<ImageEdit> {
   final _formKey2 = GlobalKey<FormState>();
   final nameController = TextEditingController();
   var _url;
   var _nameController0;
-  CollectionReference accessories =
-  FirebaseFirestore.instance.collection("accessories");
+  CollectionReference images = FirebaseFirestore.instance.collection("images");
 
   @override
   Widget build(BuildContext context) {
-
     final _nameController = _nameController0 != null
         ? _nameController0
         : TextEditingController(text: widget.name);
@@ -102,7 +100,7 @@ class _AccessoryEditState extends State<AccessoryEdit> {
                           CircularProgressIndicator(),
                       errorWidget: (context, url, error) => Icon(Icons.error),
                     )
-//              Image.network(_url)
+                  //             Image.network(_url)
                   : widget.url != null
                       ? CachedNetworkImage(
                           imageUrl: widget.url,
@@ -111,7 +109,7 @@ class _AccessoryEditState extends State<AccessoryEdit> {
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),
                         )
-                      //            Image.network(widget.url)
+                      //          Image.network(widget.url)
                       : Text('Нет картинки')),
           Padding(
             padding: EdgeInsets.all(5.0),
@@ -129,9 +127,8 @@ class _AccessoryEditState extends State<AccessoryEdit> {
                   onPressed: () {
                     setState(() {});
                     if (_formKey2.currentState!.validate()) {
-                      accessories.doc(widget.id).update({
-                        "name": _nameController.text,
-                        "url": _url != null ? _url : widget.url,
+                      images.doc(widget.id).update({
+                        "name": _nameController.text.toString().trim(),
                       }).then((_) {
                         ScaffoldMessenger.of(context)
                             .showSnackBar(SnackBar(content: Text('Сохранено')));

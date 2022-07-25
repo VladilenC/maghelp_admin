@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:maghelp_add_act/Edit/act_edit.dart';
-import 'package:maghelp_add_act/List/accessories_act_list.dart';
+import '/Utils/helpers.dart';
 
 class ListActs extends StatefulWidget {
-  ListActs({Key key,  this.title, this.event}) : super(key: key);
-  final String title;
-  final String event;
+  ListActs({Key? key, this.title, this.event, this.acts, this.accessories})
+      : super(key: key);
+  final title;
+  final event;
+  final acts;
+  final accessories;
 
   @override
   _ListActs createState() => _ListActs();
@@ -14,122 +16,192 @@ class ListActs extends StatefulWidget {
 
 class _ListActs extends State<ListActs> {
   final acts = FirebaseFirestore.instance.collection("acts");
-  final events = FirebaseFirestore.instance.collection("events");
+var finish = false;
+  @override
+  void initState() {
+    super.initState();
 
-  CollectionReference  acts1 = FirebaseFirestore.instance.collection("acts");
-  List<Map<dynamic, dynamic>> lists = [];
-  List<dynamic> listId = [];
+    Future(() async {
+      CollectionReference qqq;
+      dynamic i = 0, xxx;
+      if (widget.event != null) {
+        await acts
+            .where('event', isEqualTo: widget.event)
+            .get()
+            .then((value) async {
+          for (var val in value.docs) {
+            i = i + 1;
+            print(i.toString());
+
+            xxx = await accessoryValue(val.id);
+            qqq = val.reference.collection('accessory');
+            var element = await qqq.get();
+            await acts.doc(val.id).update({'badAcc': 0, 'accessories': xxx});
+            for (var val1 in element.docs) {
+              if ((val1.data() as dynamic)!['accId'] == '') {
+                await acts.doc(val.id).update({'badAcc': 1});
+                break;
+              }
+            }
+          }
+        });
+      } else {
+        await acts.get().then((value) async {
+          for (var val in value.docs) {
+            i = i + 1;
+            print(i.toString());
+
+            xxx = await accessoryValue(val.id);
+            qqq = val.reference.collection('accessory');
+            var element = await qqq.get();
+            await acts.doc(val.id).update({'badAcc': 0, 'accessories': xxx});
+            for (var val1 in element.docs) {
+              if ((val1.data() as dynamic)!['accId'] == '') {
+                await acts.doc(val.id).update({'badAcc': 1});
+                break;
+              }
+            }
+          }
+        });
+      }
+
+    }).then((value) {
+      setState(() {
+        finish = true;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    var _ac;
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: FutureBuilder<QuerySnapshot>(
+        body: finish ? Container():CircularProgressIndicator()
+        /*
+        listId.length > 0
+            ? ListView.builder(
+                shrinkWrap: true,
+                itemCount: listSw.length,
+                itemBuilder: (BuildContext context, index) {
+                  return Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        /*
+                        Text("ID: " + listId[index]),
+                        Text("Тип: " + lists[index]["type"]),
+                        Text("Событие: " + lists[index]["event"]),
+                        Text("Название: " + lists[index]["name"]),
+                        Text("Описание: " + lists[index]["description"]),
+                        lists[index]["url"] != null && lists[index]["url"] != ''
+                            ? CachedNetworkImage(
+                                imageUrl: lists[index]["url"],
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              )
+                            //                    Image.network(lists[index]["url"])
+                            : Container(),
+                        lists[index]["description2"] != null
+                            ? Text(lists[index]["description2"])
+                            : Container(),
+                        lists[index]["url2"] != null &&
+                                lists[index]["url2"] != ''
+                            ? CachedNetworkImage(
+                                imageUrl: lists[index]["url2"],
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                              )
+                            //                    Image.network(lists[index]["url2"])
+                            : Container(),
+                        lists[index]["description3"] != null
+                            ? Text(lists[index]["description3"])
+                            : Container(),
+                        */
+                        listSw[index] != null &&
+                                listSw[index] != ''
+                            ? CachedNetworkImage(
+                                imageUrl: listSw[index],
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) {
+                                  acts.doc(listId[index]).update({'badAcc': 1});
+                                  print(listId[index].toString());
+                                    return Icon(Icons.error);},
+                              )
+                            //                     Image.network(lists[index]["url3"])
+                            : Container(),
+                        /*
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ActEdit1(
+                                              nom: index.toString(),
+                                              id: listId[index],
+                                              name: lists[index]["name"],
+                                              type: lists[index]["type"],
+                                              event: lists[index]["event"],
+                                              description: lists[index]
+                                                  ["description"],
+                                              description2: lists[index]
+                                                  ["description2"],
+                                              description3: lists[index]
+                                                  ["description3"],
+                                              url: lists[index]["url"],
+                                              url2: lists[index]["url2"],
+                                              url3: lists[index]["url3"],
+                                              title: "Редактирование")),
+                                    );
+                                    setState(() {});
+                                  },
+                                  child: Text('Изменить')),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: listEmp[index] > 0 ? Colors.green:Colors.yellow,
+                                  onPrimary: Colors.white,
+                                  shadowColor: Colors.grey,
+                                  elevation: 5,
+                                ),
+                                onPressed: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ListAccessoriesAct(
+                                              title: "Аксессуары ",
+                                              id: listId[index],
+                                              name: lists[index]["name"],
+                                              accessories: widget.accessories,
+                                            )),
+                                  );
+                                },
+                                child: Text('Аксессуары     ' +
+                                    listEmp[index].toString()),
+                              )
+                            ]),
+                        */
+                      ],
+                    ),
+                  );
+                })
+            : CircularProgressIndicator()
 
-
-            future: acts.where("event", isEqualTo: widget.event).get().then((querySnapshot) {
-
-              querySnapshot.docs.forEach((result) {
-
-                //                var i1 = result.id;
-                //                acts.doc(i1).update({'name': '1','url': '', 'description2': '', 'url2': '', 'description3': '', 'url3': ''});
-//                  acts.doc(i1).collection('accessory').add({'name': '1','url': ''});
-                //               var i2 = result.id;
-                //               acts.doc(i1).collection("accessory").get().then((value) {
-                //                value.docs.forEach((element) {
-                //                    print(element.id);
-                //                    var i2 = element.id;
-
-                //                    acts.doc(i1).collection('accessory').doc(i2).delete();
-                //                 });
-                //               });
-              }
-              );
-
-              return querySnapshot;
-            }),
-
-
-            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasData) {
-      //          acts.doc().set({'name': '2'});
-                lists.clear();
-                listId.clear();
-                final List<DocumentSnapshot> values = snapshot.data.docs;
-
-                values.asMap().forEach((key, values) {
-         //         acts.doc().update({'name': '3'});
-                  lists.add(values.data());
-                  listId.add(values.id);
-                });
-                 return new ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: lists.length,
-                    itemBuilder: (BuildContext context,  index) {
-                      snapshot.data.docs[index];
-                       return Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text("ID: " + listId[index]),
-                            Text("Тип: " + lists[index]["type"]),
-                            Text("Событие: " + lists[index]["event"]),
-                            Text("Название: " + lists[index]["name"]),
-                            Text("Описание: " + lists[index]["description"] != null ? lists[index]["description"]:null),
-                            snapshot.data.docs[index]["url"] != null ? Image.network(snapshot.data.docs[index]["url"]):null,
-                            lists[index]["description2"] != null ? Text(lists[index]["description2"]):null,
-                            snapshot.data.docs[index]["url2"] != null ? Image.network(snapshot.data.docs[index]["url2"]):null,
-                            lists[index]["description3"] != null ? Text(lists[index]["description3"]):null,
-                            snapshot.data.docs[index]["url3"] != null ? Image.network(snapshot.data.docs[index]["url3"]):null,
-
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                            ElevatedButton(onPressed:  () async {
-                              _ac = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ActEdit1(nom: index.toString(), id: listId[index], name: lists[index]["name"], type: lists[index]["type"], event: lists[index]["event"], description: lists[index]["description"], description2: lists[index]["description2"], description3: lists[index]["description3"], url: lists[index]["url"], url2: lists[index]["url2"], url3: lists[index]["url3"], title: "Редактирование")),
-                              );
-                              setState(() {
-
-                              });
-                            },
-                                child: Text('Изменить')),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.green,
-                                onPrimary: Colors.white,
-                                shadowColor: Colors.grey,
-                                elevation: 5,
-                              ),
-                              onPressed: () async {
-
-                                _ac = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ListAccessories(title: "Аксессуары", id: listId[index], name: lists[index]["name"])),
-                                );
-
-  //                              Navigator.push(
- //                                 context,
-//                                  MaterialPageRoute(
-//                                      builder: (context) => ListActs(title: "Home Page")),
-//                                );
-                              },
-                              child: Text('Аксессуары'),
-                            )]),
-                          ],
-                        ),
-                      );
-                    });
-              }
-              return CircularProgressIndicator();
-            }
-            )
-    );
+    */
+        );
   }
 }
