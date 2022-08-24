@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase/firebase.dart' as Firebase;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:async';
@@ -23,7 +23,7 @@ class _MyPic2State extends State<MyPic2> {
   final nameController = TextEditingController();
   CollectionReference pictures =
       FirebaseFirestore.instance.collection("pictures");
-  final ref = Firebase.storage().ref();
+  final ref = FirebaseStorage.instance.ref();
 
   @override
   void initState() {
@@ -77,24 +77,23 @@ class _MyPic2State extends State<MyPic2> {
                           if (_web2 != null) {
                             var mimeType = mime(Path.basename(_media.fileName));
                             final extension = extensionFromMime(mimeType!);
-                            Firebase.StorageReference storageReference =
+                            dynamic storageReference =
                                 ref.child("picture/" +
                                     nameController.text +
                                     ".$extension");
-
-                            var metadata = Firebase.UploadMetadata(
+/*
+                            var metadata = storageReference.UploadMetadata(
                               contentType: mimeType,
                             );
-
+*/
                             var addImg = await storageReference
-                                .put(_uiWeb, metadata)
-                                .future;
+                                .putData(_uiWeb);
 
                             setState(() {
                               this.isLoading = true;
                             });
 
-                            if (addImg.state == Firebase.TaskState.SUCCESS) {
+                            if (addImg.state == TaskState.success) {
                               final downloadUrl =
                                   await storageReference.getDownloadURL();
 
@@ -147,14 +146,14 @@ class _MyPic2State extends State<MyPic2> {
   }
 
   Future getImage() async {
-    MediaInfo? mediaInfo = await ImagePickerWeb.getImageInfo;
-
+    dynamic mediaInfo = await ImagePickerWeb.getImageInfo;
+    //String? mimeType = mime(Path.basename(mediaInfo.fileName));
     setState(() {
       _media = mediaInfo;
-      _uiWeb = mediaInfo?.data;
-      //     _web = image;
-      _web2 = Image.memory(mediaInfo!.data!);
+      _uiWeb = mediaInfo.data;
+      _web2 = Image.memory(mediaInfo.data);
     });
+
   }
 /*
   Future<QuerySnapshot> getImages() {

@@ -170,30 +170,6 @@ acts.get().then((value) async {
                               )
                             : Container()
                       ]),
-/*
-                      const Text('Пустые: '),
-                      !selectBad ?
-                      Checkbox(
-                          value: selectEmpty,
-
-                          onChanged: (bool? value) {
-                            setState(() {
-                              selectEmpty = value!;
-                              if (selectEmpty) selectBad = false;
-                            });
-                          }):Container(),
-
-                      const Text('Битые: '),
-                      !selectEmpty ?
-                      Checkbox(
-                          value: selectBad,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              selectBad = value!;
-                              if (selectBad) selectEmpty = false;
-                            });
-                          }):Container(),
-*/
                       Text(kol.toString())
                     ],
                   ),
@@ -211,11 +187,7 @@ acts.get().then((value) async {
                               )));
                         else {
                           List<DropdownMenuItem> typeSubs = [];
-
                           final    values = snapshot.data!.docs.toList();
-
-
-
                           for (int i = 0; i < values.length; i++) {
                             DocumentSnapshot snap = values[i];
                             typeSubs.add(
@@ -305,7 +277,6 @@ acts.get().then((value) async {
                               errorWidget: (context, url, error) =>
                                   Icon(Icons.error),
                             )
-
                           //                 Image.network(_url)
                           : Text('Нет картинки', textAlign: TextAlign.center)),
                   Padding(
@@ -570,7 +541,6 @@ acts.get().then((value) async {
                         },
                         child: Text('Список'),
                       ),
-
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Colors.green,
@@ -592,7 +562,6 @@ acts.get().then((value) async {
                         },
                         child: Text('Проверка'),
                       ),
-
                     ],
                   ),
                   SizedBox(height: 10)
@@ -604,40 +573,5 @@ acts.get().then((value) async {
     super.dispose();
     nameController.dispose();
     descriptionController.dispose();
-  }
-}
-
-class Test extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    var err =
-        'https://firebasestorage.googleapis.com/v0/b/maghelp-88090.appspot.com/o/accessory%2F%D0%97%D0%BE%D0%BB%D0%BE%D1%82%D0%BE%D0%B5%20%D0%BA%D0%BE%D0%BB%D1%8C%D1%86%D0%BE%20%D1%81%20%D0%BA%D0%B0%D0%BC%D0%BD%D0%B5%D0%BC%20%D0%BF%D0%BE%D0%B4%20%D1%86%D0%B2%D0%B5%D1%82%20%D0%B3%D0%BB%D0%B0%D0%B7%20%D0%B4%D0%B5%D0%B2%D1%83%D1%88%D0%BA%D0%B8.jpe?alt=media&token=25ca7b07-5d7d-4e8c-89c5-672dbe7d695b';
-    var suc =
-        'https://firebasestorage.googleapis.com/v0/b/maghelp-88090.appspot.com/o/accessory%2F%D0%A4%D1%83%D1%82%D0%BB%D1%8F%D1%80%20%D0%BE%D1%82%20%D0%BA%D0%BE%D0%BB%D1%8C%D1%86%D0%B0.jpe?alt=media&token=a7128e21-77d3-435d-8773-949ab19a3f41';
-    var err2 =
-        'https://firebasestorage.googleapis.com/v0/b/maghelp-88090.appspot.com/o/accessory%2F.png?alt=media&token=91b96646-3842-4b88-a65b-e66e28b74178';
-    var suc2 =
-        'https://firebasestorage.googleapis.com/v0/b/maghelp-88090.appspot.com/o/accessory%2FФутляр%20от%20кольца.jpe?alt=media&token=a7128e21-77d3-435d-8773-949ab19a3f41';
-    var suc4 = 'https://imaghelp.ru/politic.pdf';
-    dynamic imageSize = 0;
-    //  String imgUrl = "https://firebasestorage.googleapis.com/v0/b/yourFIrebaseProjectID/o/avatars%2F%2B919999999999%2Favatar.jpg?alt=media";
-    String imgUrl = err;
-    print('2222222');
-
-    final acts = FirebaseFirestore.instance.collection("acts");
-
-    return Scaffold(
-        body: Image.network(imgUrl,
-            errorBuilder: (context, exception, stackTrace) {
-      print('666666');
-      return Image.asset('assets/images/asia.jpg');
-    })
-        /*
-      CachedNetworkImage(imageUrl: imgUrl,errorWidget: (context, url, error) {
-        print('33333333333333333333333333333333');
-        return Icon(Icons.error);}),
-      */
-        );
   }
 }

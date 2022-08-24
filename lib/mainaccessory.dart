@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase/firebase.dart' as Firebase;
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import 'dart:async';
@@ -24,6 +24,7 @@ class _MyPic3State extends State<MyPic3> {
   final nameController = TextEditingController();
   CollectionReference accessories =
       FirebaseFirestore.instance.collection("accessories");
+  final ref = FirebaseStorage.instance.ref();
 
   @override
   void initState() {
@@ -82,20 +83,21 @@ class _MyPic3State extends State<MyPic3> {
                                 mime(Path.basename(_media.fileName.toString()));
                             final extension =
                                 extensionFromMime(mimeType.toString());
-                            Firebase.StorageReference storageReference =
-                                Firebase.storage().ref().child("accessory/" +
-                                    nameController.text +
-                                    ".$extension");
-                            var metadata = Firebase.UploadMetadata(
+                            dynamic storageReference = ref.child("accessory/" +
+                                nameController.text +
+                                ".$extension");
+                            /*
+                            var metadata = storageReference.UploadMetadata(
                               contentType: mimeType,
                             );
+
+                             */
                             var addImg = await storageReference
-                                .put(_uiWeb, metadata)
-                                .future;
+                                .putData(_uiWeb);
                             setState(() {
                               this.isLoading = true;
                             });
-                            if (addImg.state == Firebase.TaskState.SUCCESS) {
+                            if (addImg.state == TaskState.success) {
                               final downloadUrl =
                                   await storageReference.getDownloadURL();
                               setState(() {
@@ -105,9 +107,9 @@ class _MyPic3State extends State<MyPic3> {
                                 'url': downloadUrl.toString(),
                                 'name': nameController.text
                               });
-                              setState(() {
-                                this.isLoading = false;
-                              });
+                              // setState(() {
+                              //   this.isLoading = false;
+                              // });
                               print("Добавлено");
                               nameController.clear();
                               _web2 = null;
@@ -146,11 +148,13 @@ class _MyPic3State extends State<MyPic3> {
   }
 
   Future getImage() async {
-    var mediaInfo = await ImagePickerWeb.getImageInfo;
+    dynamic mediaInfo = await ImagePickerWeb.getImageInfo;
+    //String? mimeType = mime(Path.basename(mediaInfo.fileName));
     setState(() {
       _media = mediaInfo;
-      _uiWeb = mediaInfo?.data;
-      _web2 = Image.memory(mediaInfo!.data!);
+      _uiWeb = mediaInfo.data;
+      _web2 = Image.memory(mediaInfo.data);
     });
+
   }
 }

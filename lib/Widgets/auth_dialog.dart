@@ -100,7 +100,7 @@ class _AuthDialogState extends State<AuthDialog> {
                           ),
                         ),
                         SizedBox(width: 50),
-                        Text('Версия 1.4.1')
+                        Text('Версия 1.4.5')
                       ]),
                 ),
                 SizedBox(height: 30),

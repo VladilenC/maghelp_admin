@@ -19,20 +19,12 @@ class ListAccessoriesAct extends StatefulWidget {
 class _ListAccessoriesAct extends State<ListAccessoriesAct> {
   final acts = FirebaseFirestore.instance.collection("acts");
 
-  /*
-  final Stream<QuerySnapshot> accessories = FirebaseFirestore.instance
-      .collection("accessories")
-      .orderBy('name')
-      .snapshots();
- */
   bool isRetrieved = false;
   var lists = [], listUrl = [], listName = [];
   List listId = [];
 
-  /*
   @override
   void initState() {
-
     List _lists = [];
     List _listId = [];
     List _listUrl = [];
@@ -54,7 +46,6 @@ Future(() async {
     _listUrl.add(await accessoryUrl(_lists[i]['accId']));
     _listName.add(await accessoryName(_lists[i]['accId']));
   }
-
   setState(() {
     lists = _lists;
     listId = _listId;
@@ -68,8 +59,7 @@ Future(() async {
     super.initState();
 
   }
-
-
+/*
   @override
   void dispose() {
     super.dispose();
@@ -77,40 +67,6 @@ Future(() async {
 */
   @override
   Widget build(BuildContext context) {
-
-    List _lists = [];
-    List _listId = [];
-    List _listUrl = [];
-    List _listName = [];
-    final actAcc = FirebaseFirestore.instance.collection("acts").doc(widget.id).collection('accessory');
-    Future(() async {
-      await actAcc.get().then((querySnapshot) {
-        _lists.clear();
-        _listId.clear();
-        dynamic values = querySnapshot.docs;
-        values.asMap().forEach((key, values) async {
-          _lists.add(values.data());
-          _listId.add(values.id);
-        });
-      });
-    }).then((value) async {
-      _listUrl.clear();
-      _listName.clear();
-      for (var i = 0; i < _lists.length; i++) {
-        _listUrl.add(await accessoryUrl(_lists[i]['accId']));
-        _listName.add(await accessoryName(_lists[i]['accId']));
-      }
-if (mounted) {
-  setState(() {
-    lists = _lists;
-    listId = _listId;
-    listUrl = _listUrl;
-    listName = _listName;
-  });
-}
-    });
-
-
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title + ':  ' + widget.name),
@@ -134,14 +90,14 @@ if (mounted) {
                     shrinkWrap: true,
                     itemCount: lists.length,
                     itemBuilder: (BuildContext context, index) {
-                      return listName.isNotEmpty ? ListTile(
+                      return ListTile(
                         contentPadding: EdgeInsets.all(8.0),
                         title: Text(lists[index]["name"] +
                             '-----' +
-                            lists[index]["accId"] + '+++++' + listName[index]??''),
+                            lists[index]["accId"]),
                         leading: lists[index]["url"] != null
                             ? CachedNetworkImage(
-                                imageUrl: listUrl[index],
+                                imageUrl: lists[index]["url"],
                                 placeholder: (context, url) =>
                                     CircularProgressIndicator(),
                                 errorWidget: (context, url, error) {
@@ -170,14 +126,12 @@ if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(onError)));
                             });
-                 //           setState(() {});
+                            setState(() {});
                           },
                         ),
                         onTap: () {},
-                      ):Container();
+                      );
                     }));
-
-
 
   }
 }

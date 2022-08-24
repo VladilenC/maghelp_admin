@@ -18,7 +18,8 @@ class ActEdit1 extends StatefulWidget {
       this.url2,
       this.description3,
       this.url3,
-      this.title})
+      this.title,
+      this.accessories})
       : super(key: key);
   final dynamic title;
   final dynamic id;
@@ -32,6 +33,7 @@ class ActEdit1 extends StatefulWidget {
   final dynamic url;
   final dynamic url2;
   final dynamic url3;
+  final accessories;
 
   @override
   _ActEdit1 createState() => _ActEdit1();
@@ -61,7 +63,8 @@ class _ActEdit1 extends State<ActEdit1> {
                   url: widget.url,
                   url2: widget.url2,
                   url3: widget.url3,
-                  title: widget.title),
+                  title: widget.title,
+                  accessories: widget.accessories),
             ]),
       )),
     );
@@ -82,7 +85,8 @@ class ActEdit extends StatefulWidget {
       this.url2,
       this.description3,
       this.url3,
-      this.title})
+      this.title,
+      this.accessories})
       : super(key: key);
   final dynamic nom;
   final dynamic id;
@@ -96,6 +100,7 @@ class ActEdit extends StatefulWidget {
   final dynamic url2;
   final dynamic url3;
   final dynamic title;
+  final accessories;
 
   @override
   _ActEdit1State createState() => _ActEdit1State();
@@ -388,7 +393,8 @@ class _ActEdit1State extends State<ActEdit> {
                           builder: (context) => ListAccessoriesAct(
                               title: "Аксессуары",
                               id: widget.id,
-                              name: widget.name)),
+                              name: widget.name,
+                              accessories: widget.accessories)),
                     );
                   },
                   child: Text('Аксессуары'),

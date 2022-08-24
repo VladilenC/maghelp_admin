@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:image_picker_web/image_picker_web.dart';
+import 'package:mime_type/mime_type.dart';
+import 'package:path/path.dart' as Path;
 
 class AccessoryEdit1 extends StatefulWidget {
   AccessoryEdit1({Key? key, this.nom, this.id, this.name, this.title, this.url})
@@ -52,6 +56,7 @@ class AccessoryEdit extends StatefulWidget {
   final dynamic name;
   final dynamic url;
 
+
   @override
   _AccessoryEditState createState() => _AccessoryEditState();
 }
@@ -59,17 +64,21 @@ class AccessoryEdit extends StatefulWidget {
 class _AccessoryEditState extends State<AccessoryEdit> {
   final _formKey2 = GlobalKey<FormState>();
   final nameController = TextEditingController();
-  var _url;
-  var _nameController0;
+ // var _url;
+ // var _nameController0;
   CollectionReference accessories =
   FirebaseFirestore.instance.collection("accessories");
+  final ref = FirebaseStorage.instance.ref();
+  var _web2;
+  var _uiWeb;
+  var _media;
+  bool isLoading = false;
+
 
   @override
   Widget build(BuildContext context) {
 
-    final _nameController = _nameController0 != null
-        ? _nameController0
-        : TextEditingController(text: widget.name);
+    final nameController = TextEditingController(text: widget.name);
 
     return Form(
         key: _formKey2,
@@ -78,7 +87,7 @@ class _AccessoryEditState extends State<AccessoryEdit> {
           Padding(
             padding: EdgeInsets.all(5.0),
             child: TextFormField(
-              controller: _nameController,
+              controller: nameController,
               decoration: InputDecoration(
                 labelText: "Название",
                 enabledBorder: OutlineInputBorder(
@@ -95,13 +104,17 @@ class _AccessoryEditState extends State<AccessoryEdit> {
           ),
           Padding(
               padding: EdgeInsets.all(5.0),
-              child: _url != null
-                  ? CachedNetworkImage(
-                      imageUrl: _url,
+              child: _web2 != null
+                  ? _web2
+              /*
+              CachedNetworkImage(
+                      imageUrl: _web2,
                       placeholder: (context, url) =>
                           CircularProgressIndicator(),
                       errorWidget: (context, url, error) => Icon(Icons.error),
                     )
+
+               */
 //              Image.network(_url)
                   : widget.url != null
                       ? CachedNetworkImage(
@@ -113,6 +126,19 @@ class _AccessoryEditState extends State<AccessoryEdit> {
                         )
                       //            Image.network(widget.url)
                       : Text('Нет картинки')),
+
+              ElevatedButton(
+                  child: Text("Выбор картинки"),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.lightBlue,
+                    onPrimary: Colors.white,
+                    shadowColor: Colors.grey,
+                    elevation: 5,
+                  ),
+                  onPressed: getImage),
+
+
+
           Padding(
             padding: EdgeInsets.all(5.0),
             child: Column(
@@ -126,21 +152,60 @@ class _AccessoryEditState extends State<AccessoryEdit> {
                     shadowColor: Colors.grey,
                     elevation: 5,
                   ),
-                  onPressed: () {
-                    setState(() {});
+                  onPressed: () async {
+           //         setState(() {});
                     if (_formKey2.currentState!.validate()) {
-                      accessories.doc(widget.id).update({
-                        "name": _nameController.text,
-                        "url": _url != null ? _url : widget.url,
-                      }).then((_) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text('Сохранено')));
-                        nameController.clear();
-                      }).catchError((onError) {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text(onError)));
-                      });
+
+                      if (_web2 != null) {
+                        var mimeType =
+                        mime(Path.basename(_media.fileName.toString()));
+                        final extension =
+                        extensionFromMime(mimeType.toString());
+                        dynamic storageReference = ref.child("accessory/" +
+                            nameController.text +
+                            ".$extension");
+                        var addImg = await storageReference
+                            .putData(_uiWeb);
+                        setState(() {
+                          this.isLoading = true;
+                        });
+                        if (addImg.state == TaskState.success) {
+                          final downloadUrl =
+                          await storageReference.getDownloadURL();
+                          setState(() {
+                            this.isLoading = false;
+                          });
+                          await accessories.doc(widget.id).update({
+                            'url': downloadUrl.toString(),
+                            'name': nameController.text
+                          });
+                          // setState(() {
+                          //   this.isLoading = false;
+                          // });
+                          print("Добавлено");
+                          nameController.clear();
+                          _web2 = null;
+                          _media = null;
+                        }
+                      }
+else {
+                        accessories.doc(widget.id).update({
+                          "name": nameController.text
+                        }).then((_) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(
+                              SnackBar(content: Text('Сохранено')));
+                          nameController.clear();
+                        }).catchError((onError) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(onError)));
+                        });
+                      }
                     }
+
+
+
+
                     Navigator.pop(context);
                   },
                   child: Text('Сохранить'),
@@ -149,6 +214,17 @@ class _AccessoryEditState extends State<AccessoryEdit> {
             ),
           ),
         ])));
+  }
+
+  Future getImage() async {
+    dynamic mediaInfo = await ImagePickerWeb.getImageInfo;
+    //String? mimeType = mime(Path.basename(mediaInfo.fileName));
+    setState(() {
+      _media = mediaInfo;
+      _uiWeb = mediaInfo.data;
+      _web2 = Image.memory(mediaInfo.data);
+    });
+
   }
 
   @override

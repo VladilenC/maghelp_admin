@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maghelp_add_act/Edit/act_edit.dart';
 import 'package:maghelp_add_act/List/accessories_act_list.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-//import 'package:http/http.dart' as http;
-//import 'package:url_launcher/url_launcher.dart';
+
 
 class ListActsOriginal extends StatefulWidget {
   ListActsOriginal(
@@ -174,21 +173,25 @@ class _ListActsOriginal extends State<ListActsOriginal> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) => ActEdit1(
-                                                  nom: index.toString(),
-                                                  id: listId[index],
-                                                  name: lists[index]["name"],
-                                                  type: lists[index]["type"],
-                                                  event: lists[index]["event"],
-                                                  description: lists[index]
-                                                      ["description"],
-                                                  description2: lists[index]
-                                                      ["description2"],
-                                                  description3: lists[index]
-                                                      ["description3"],
-                                                  url: lists[index]["url"],
-                                                  url2: lists[index]["url2"],
-                                                  url3: lists[index]["url3"],
-                                                  title: "Редактирование")),
+                                                    nom: index.toString(),
+                                                    id: listId[index],
+                                                    name: lists[index]["name"],
+                                                    type: lists[index]["type"],
+                                                    event: lists[index]
+                                                        ["event"],
+                                                    description: lists[index]
+                                                        ["description"],
+                                                    description2: lists[index]
+                                                        ["description2"],
+                                                    description3: lists[index]
+                                                        ["description3"],
+                                                    url: lists[index]["url"],
+                                                    url2: lists[index]["url2"],
+                                                    url3: lists[index]["url3"],
+                                                    title: "Редактирование",
+                                                    accessories:
+                                                        widget.accessories,
+                                                  )),
                                         );
                                         setState(() {});
                                       },

@@ -39,9 +39,11 @@ class _ListAccessoriesAdd extends State<ListAccessoriesAdd> {
         inBar: false,
         setState: setState,
         onSubmitted: (text) {
-          setState(() {
-            textSearch = text;
-          });
+          if (mounted) {
+            setState(() {
+              textSearch = text;
+            });
+          }
         },
         buildDefaultAppBar: buildAppBar);
   }
@@ -89,8 +91,7 @@ class _ListAccessoriesAdd extends State<ListAccessoriesAdd> {
                                     CircularProgressIndicator(),
                                 errorWidget: (context, url, error) {
                                   return Icon(Icons.error);
-                                }
-                              )
+                                })
                             //                  Image.network(lists[index]["url"])
                             : null,
                         onTap: () {

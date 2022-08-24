@@ -6,10 +6,8 @@ import 'package:maghelp_add_act/mainimageweb.dart';
 import 'package:maghelp_add_act/mainpictureweb.dart';
 import 'package:maghelp_add_act/mainaccessory.dart';
 import 'moon_list.dart';
-import 'mainadd.dart';
 import 'package:flutter/material.dart';
 import 'report.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppMenu extends StatefulWidget {
   AppMenu({Key? key, this.user,this.acts, this.accessories}) : super(key: key);
@@ -20,7 +18,6 @@ class AppMenu extends StatefulWidget {
 }
 
 class _AppMenuState extends State<AppMenu> {
- // final Stream<QuerySnapshot> typeStream = FirebaseFirestore.instance.collection('types').snapshots();
 
   @override
   void initState() {
@@ -49,7 +46,6 @@ class _AppMenuState extends State<AppMenu> {
                   Tab(text: 'Аксессуары'),
                   Tab(text: 'Календарь'),
                   Tab(text: 'Отчеты'),
-           //       Tab(text: 'FireBase')
                 ],
               ),
             ),
@@ -64,7 +60,6 @@ class _AppMenuState extends State<AppMenu> {
                 MyPic3(accessories: widget.accessories),
                 ListMoon(),
                 MyReport(),
-   //             MyAdd()
               ],
             ),
           ),

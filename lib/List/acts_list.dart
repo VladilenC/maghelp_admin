@@ -16,7 +16,7 @@ class ListActs extends StatefulWidget {
 
 class _ListActs extends State<ListActs> {
   final acts = FirebaseFirestore.instance.collection("acts");
-var finish = false;
+  var finish = false;
   @override
   void initState() {
     super.initState();
@@ -64,7 +64,6 @@ var finish = false;
           }
         });
       }
-
     }).then((value) {
       setState(() {
         finish = true;
@@ -83,125 +82,7 @@ var finish = false;
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: finish ? Container():CircularProgressIndicator()
-        /*
-        listId.length > 0
-            ? ListView.builder(
-                shrinkWrap: true,
-                itemCount: listSw.length,
-                itemBuilder: (BuildContext context, index) {
-                  return Card(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        /*
-                        Text("ID: " + listId[index]),
-                        Text("Тип: " + lists[index]["type"]),
-                        Text("Событие: " + lists[index]["event"]),
-                        Text("Название: " + lists[index]["name"]),
-                        Text("Описание: " + lists[index]["description"]),
-                        lists[index]["url"] != null && lists[index]["url"] != ''
-                            ? CachedNetworkImage(
-                                imageUrl: lists[index]["url"],
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              )
-                            //                    Image.network(lists[index]["url"])
-                            : Container(),
-                        lists[index]["description2"] != null
-                            ? Text(lists[index]["description2"])
-                            : Container(),
-                        lists[index]["url2"] != null &&
-                                lists[index]["url2"] != ''
-                            ? CachedNetworkImage(
-                                imageUrl: lists[index]["url2"],
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              )
-                            //                    Image.network(lists[index]["url2"])
-                            : Container(),
-                        lists[index]["description3"] != null
-                            ? Text(lists[index]["description3"])
-                            : Container(),
-                        */
-                        listSw[index] != null &&
-                                listSw[index] != ''
-                            ? CachedNetworkImage(
-                                imageUrl: listSw[index],
-                                placeholder: (context, url) =>
-                                    CircularProgressIndicator(),
-                                errorWidget: (context, url, error) {
-                                  acts.doc(listId[index]).update({'badAcc': 1});
-                                  print(listId[index].toString());
-                                    return Icon(Icons.error);},
-                              )
-                            //                     Image.network(lists[index]["url3"])
-                            : Container(),
-                        /*
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ActEdit1(
-                                              nom: index.toString(),
-                                              id: listId[index],
-                                              name: lists[index]["name"],
-                                              type: lists[index]["type"],
-                                              event: lists[index]["event"],
-                                              description: lists[index]
-                                                  ["description"],
-                                              description2: lists[index]
-                                                  ["description2"],
-                                              description3: lists[index]
-                                                  ["description3"],
-                                              url: lists[index]["url"],
-                                              url2: lists[index]["url2"],
-                                              url3: lists[index]["url3"],
-                                              title: "Редактирование")),
-                                    );
-                                    setState(() {});
-                                  },
-                                  child: Text('Изменить')),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: listEmp[index] > 0 ? Colors.green:Colors.yellow,
-                                  onPrimary: Colors.white,
-                                  shadowColor: Colors.grey,
-                                  elevation: 5,
-                                ),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ListAccessoriesAct(
-                                              title: "Аксессуары ",
-                                              id: listId[index],
-                                              name: lists[index]["name"],
-                                              accessories: widget.accessories,
-                                            )),
-                                  );
-                                },
-                                child: Text('Аксессуары     ' +
-                                    listEmp[index].toString()),
-                              )
-                            ]),
-                        */
-                      ],
-                    ),
-                  );
-                })
-            : CircularProgressIndicator()
-
-    */
-        );
+        body:
+            finish ? Text('Проверка закончена') : CircularProgressIndicator());
   }
 }
